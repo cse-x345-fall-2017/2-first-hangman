@@ -122,16 +122,16 @@ hangman code and play a game with you.
 ## Grading
 
 This assignment will be graded out of 120 points. 
-| marks | for |
-| -- | ------------------------------------------ |
-| 70 | Does the program work and meet the API? | 
-|  5 | Does it follow the structure above? | 
-| 10 | Is the code divided into small functions? | 
-| 10 | Does it use pattern matching where possible in preference to conditional logic? | 
-|  5 | Does it raise exceptions when fed invalid data? | 
-| 10 | Is the program written in an idiomatic style that uses appropriate and effective language and library features | 
-|  5 | Is the code well laid out,  appropriately using indentation, blank lines, vertical alignment? | 
-|  5 | Are names well chosen, descriptive, but not verbose? |
+| marks | for                                        |
+| ----- | ------------------------------------------ |
+|    70 | Does the program work and meet the API? | 
+|     5 | Does it follow the structure above? | 
+|    10 | Is the code divided into small functions? | 
+|    10 | Does it use pattern matching where possible in preference to conditional logic? | 
+|     5 | Does it raise exceptions when fed invalid data? | 
+|    10 | Is the program written in an idiomatic style that uses appropriate and effective language and library features | 
+|     5 | Is the code well laid out,  appropriately using indentation, blank lines, vertical alignment? | 
+|     5 | Are names well chosen, descriptive, but not verbose? |
 
 An additional 10 bonus points are available for exceptional code that
 delights me.
