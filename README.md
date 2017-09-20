@@ -124,7 +124,7 @@ hangman code and play a game with you.
 This assignment will be graded out of 120 points.
 
 | marks | for                                        |
-| ----- | ------------------------------------------ |
+| ----: | ------------------------------------------ |
 |    70 | Does the program work and meet the API? | 
 |     5 | Does it follow the structure above? | 
 |    10 | Is the code divided into small functions? | 
