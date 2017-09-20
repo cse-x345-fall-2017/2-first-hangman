@@ -121,7 +121,8 @@ hangman code and play a game with you.
   
 ## Grading
 
-This assignment will be graded out of 120 points. 
+This assignment will be graded out of 120 points.
+
 | marks | for                                        |
 | ----- | ------------------------------------------ |
 |    70 | Does the program work and meet the API? | 
