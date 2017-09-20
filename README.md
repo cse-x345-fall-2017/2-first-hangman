@@ -116,8 +116,13 @@ iex> tally
 ## Once You're Done
 
 I've included a third project, called `human_player`. If you go into
-its directory and enter the command `mix run`, it should call your
-hangman code and play a game with you.
+its directory and enter the command 
+
+~~~
+$  mix run -e HumanPlayer.play
+~~~
+
+This will run the hangman code and play a game with you.
   
 ## Grading
 
