@@ -21,7 +21,7 @@ letters:       # a list of single character strings. If a letter in a particular
                # position has been guessed, that letter will appear in `letters`. 
                # Otherwise, it will be shown as an underscore
 used:          # A sorted list of the letters already guessed
-last_guessed:  # the last letter guessed by the player
+last_guess:    # the last letter guessed by the player
 ~~~ 
 
 This tally is used by projects we'll be writing later. It allows them to display the
