@@ -19,19 +19,8 @@ defmodule Hangman.Game do
     init_game()
   end
 
-  def tally(%State{
-                    game_state:       state,
-                    turns_left:       turns_left,
-                    last_guess:       last_guess,
-                    used:             used
-                  } = game) do
-    %{
-      game_state: state,
-      turns_left: turns_left,
-      used:       used,
-      last_guess: last_guess,
-      letters:    replace_letters(game, used)
-    }
+  def tally(game) do
+    get_tally(game)
   end
 
   def make_move(game, guess) do
@@ -64,6 +53,21 @@ defmodule Hangman.Game do
   ###############################
   # Private Functions for tally #
   ###############################
+
+  def get_tally(%State{
+                    game_state:       state,
+                    turns_left:       turns_left,
+                    last_guess:       last_guess,
+                    used:             used
+                  } = game) do
+    %{
+      game_state: state,
+      turns_left: turns_left,
+      used:       used,
+      last_guess: last_guess,
+      letters:    replace_letters(game, used)
+    }
+  end
 
   defp to_list(word) do
     word
