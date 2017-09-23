@@ -108,6 +108,15 @@ defmodule Hangman.Game do
     handle_guess(game, guess in used, guess)
   end
 
+  # For fun
+  defp handle_guess(%State{ game_state: :lost} ,_, _turns) do
+    try do
+      throw("Game Over")
+    catch
+      _ -> "Game Over! You have lost all your turns."
+    end
+  end
+
   # If guess is in used, then set state to :already_used
   defp handle_guess(game, true, _guess) do
     game = %State{ game | game_state: :already_used }
@@ -124,7 +133,7 @@ defmodule Hangman.Game do
   # Also has to checked if the game is won and set game_state accordingly
   defp handle_map(game, true, guess) do
     game =  %State{ game |  last_guess:       guess,
-                            used:             game.used ++ [guess] |> Enum.sort,
+                            used:             concat_and_sort(game.used, guess),
                             left_letters_set: MapSet.delete(game.left_letters_set, guess)
             }
     handle_state(game, MapSet.size(game.left_letters_set))
@@ -134,10 +143,16 @@ defmodule Hangman.Game do
   # check if the state is :bad_guess or :lost
   defp handle_map(game, false, guess) do
     game = %State{ game | turns_left: game.turns_left - 1,
-                          used:       game.used ++ [guess] |> Enum.sort,
+                          used:       concat_and_sort(game.used, guess),
                           last_guess: guess
            }
     handle_turns(game, game.turns_left)
+  end
+
+  # Helper function to add and sort the list of used letters
+  defp concat_and_sort(used, guess) do
+    used ++ [guess]
+    |> Enum.sort()
   end
 
   # If number of turns is zero, then set the game_state to :lost and update letters
@@ -152,11 +167,6 @@ defmodule Hangman.Game do
   defp handle_turns(game, turns) when turns > 0 do
     game = %State{ game | game_state: :bad_guess }
     { game, tally(game) }
-  end
-
-  # For fun
-  defp handle_turns(_game, _turns) do
-    IO.puts("You have lost all your turns! Please start a new game to play again.")
   end
 
   # Check if the set of letters left is none and set the game_state to :won
