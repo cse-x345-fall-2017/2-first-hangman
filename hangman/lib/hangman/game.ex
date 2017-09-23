@@ -41,10 +41,10 @@ defmodule Hangman.Game do
   
   defp init_game() do
     word = Dictionary.random_word()
-    %State{ word: word, left_letters_set: get_word_set(word) }
+    %State{ word: word, left_letters_set: get_letters_set(word) }
   end
 
-  defp get_word_set(word) do
+  defp get_letters_set(word) do
     word
     |> String.codepoints
     |> MapSet.new()
@@ -55,10 +55,10 @@ defmodule Hangman.Game do
   ###############################
 
   def get_tally(%State{
-                    game_state:       state,
-                    turns_left:       turns_left,
-                    last_guess:       last_guess,
-                    used:             used
+                    game_state: state,
+                    turns_left: turns_left,
+                    last_guess: last_guess,
+                    used:       used
                   } = game) do
     %{
       game_state: state,
