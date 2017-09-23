@@ -39,11 +39,13 @@ defmodule Hangman.Game do
   # Private Functions for new_game #
   ##################################
   
+  # Initilize the state of the game
   defp init_game() do
     word = Dictionary.random_word()
     %State{ word: word, left_letters_set: get_letters_set(word) }
   end
 
+  # Converts the random word into the MapSet
   defp get_letters_set(word) do
     word
     |> String.codepoints
@@ -54,6 +56,7 @@ defmodule Hangman.Game do
   # Private Functions for tally #
   ###############################
 
+  # Return a map based on the game state and current status of the game
   def get_tally(%State{
                     game_state: state,
                     turns_left: turns_left,
@@ -69,23 +72,27 @@ defmodule Hangman.Game do
     }
   end
 
+  # Convert the word to list of letters
   defp to_list(word) do
     word
     |> String.codepoints()
     |> Enum.to_list()
   end
 
+  # If lost then return then set the letters as list of word
   defp replace_letters(%State{ game_state: :lost} = game, _) do
     game.word
     |> to_list
   end
 
+  # Set all the letters in the word by an _. Used when game is initialized i.e., when used is empty. 
   defp replace_letters(%State{ word: word }, []) do
     word
     |> String.replace(~r/\w/, "_")
     |> to_list
   end
 
+  # Set the letters that have not yet been guessed by an _ in appropriate positions
   defp replace_letters(%State{ word: word}, used) do
     word
     |> String.replace(~r/[^#{used}]/, "_")
@@ -96,19 +103,25 @@ defmodule Hangman.Game do
   # Private Functions for make_move #
   ###################################
 
+  # check if guess is in used and handle the guess accordingly
   defp make_move_handler(%State{ used: used } = game, guess) do
     handle_guess(game, guess in used, guess)
   end
 
+  # If guess is in used, then set state to :already_used
   defp handle_guess(game, true, _guess) do
     game = %State{ game | game_state: :already_used }
     { game, tally(game) }
   end
 
+  # If guess is not in used, then check if guess is in the set of letters left
+  # and handle accordingly
   defp handle_guess(game, false, guess) do
     handle_map(game, guess in game.left_letters_set, guess)
   end
 
+  # If guess is in set of letters left then update used and set of left letters 
+  # Also has to checked if the game is won and set game_state accordingly
   defp handle_map(game, true, guess) do
     game =  %State{ game |  last_guess:       guess,
                             used:             game.used ++ [guess] |> Enum.sort,
@@ -117,6 +130,8 @@ defmodule Hangman.Game do
     handle_state(game, MapSet.size(game.left_letters_set))
   end
 
+  # If guess is not in set of letters left then update turns left and used and
+  # check if the state is :bad_guess or :lost
   defp handle_map(game, false, guess) do
     game = %State{ game | turns_left: game.turns_left - 1,
                           used:       game.used ++ [guess] |> Enum.sort,
@@ -125,6 +140,7 @@ defmodule Hangman.Game do
     handle_turns(game, game.turns_left)
   end
 
+  # If number of turns is zero, then set the game_state to :lost and update letters
   defp handle_turns(game, 0) do
     game = %State{ game | game_state: :lost,
                           letters: game.word |> String.codepoints()
@@ -132,23 +148,32 @@ defmodule Hangman.Game do
     { game, tally(game) }
   end
 
+  # If number of turns is greater than 0, then set the game_state to :bad_guess
   defp handle_turns(game, turns) when turns > 0 do
     game = %State{ game | game_state: :bad_guess }
     { game, tally(game) }
   end
 
+  # For fun
   defp handle_turns(_game, _turns) do
     IO.puts("You have lost all your turns! Please start a new game to play again.")
   end
 
+  # Check if the set of letters left is none and set the game_state to :won
   defp handle_state(game, 0) do
     game = %State{ game | game_state: :won }
     { game, tally(game) }
   end
 
+  # Check if there are any more in the set of letters left and 
+  # set the game_state to :good_guess
   defp handle_state(game, _) do
     game = %State{ game | game_state: :good_guess }
     { game, tally(game) }
   end
 
 end
+
+#$$$$$$$$$$$$$#
+# End of Game #
+#$$$$$$$$$$$$$#
