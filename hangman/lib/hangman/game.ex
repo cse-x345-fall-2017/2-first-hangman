@@ -1,14 +1,18 @@
 defmodule Hangman.Game do
 
-  # game structure
-  defstruct \
-    game_state: :initializing, 
-    word: "", 
-    last_guess: "",
-    turns_left: 7, 
-    word_chars: [],
-    letters: [], 
-    used: []
+  # game state structure
+  defmodule GameState do
+  
+    defstruct(
+      game_state:  :initializing, 
+      last_guess:  "",             # last guess by the player
+      turns_left:  7,              # number of turns left
+      answers:     [],             # answers to all letters
+      letters:     [],             # correctly guess letters
+      used:        []              # all letteres used for guesses
+   )
+   
+  end
 
     
   # === PUBLIC FUNCTIONS ===================================================== #
@@ -19,16 +23,15 @@ defmodule Hangman.Game do
     word = Dictionary.random_word()
       |> String.trim() # "\r" is showing up on my windows machine, so remove it
       
-    %Hangman.Game{
-      word:        word,
-      letters:     init_letters(word),
-      word_chars:  String.codepoints(word)
+    %GameState{
+      letters:  init_letters(word),
+      answers:  String.codepoints(word)
     }
   end
   
   
   # return the current tally of the game
-  def tally(game) do
+  def tally(game = %GameState{}) do
     %{
       game_state:  game.game_state,
       turns_left:  game.turns_left,
@@ -40,7 +43,7 @@ defmodule Hangman.Game do
   
   
   # handle a move made by the game player
-  def make_move(game, guess) do
+  def make_move(game = %GameState{}, guess) do
     new_game = evaluate_guess(game, guess, guess in game.used)
     { new_game, new_game |> tally() }
   end
@@ -51,54 +54,63 @@ defmodule Hangman.Game do
   
   # handle a move with an already used guess
   defp evaluate_guess(game, _guess, _already_used = true) do 
-    %{game | game_state: :already_used}
+    %{ game | game_state: :already_used }
   end
   
   # handle a move with a new guess
   defp evaluate_guess(game, guess, _new_guess) do
-    handle_new_guess(game, guess, guess in game.word_chars)
+    handle_new_guess(game, guess, guess in game.answers)
   end
   
   
   # handle a correct new guess
   defp handle_new_guess(game, guess, _correct_guess = true) do
-    game_update = %{ 
-      game |
-        game_state:  :good_guess,
-        last_guess:  guess,
-        letters:     reveal_letters(game, guess),
-        used:        [guess | game.used]
-    }
-    check_if_won(game_update, "_" not in game_update.letters)
+    game
+      |> update_game_state(guess, :good_guess, game.turns_left)
+      |> reveal_letters(guess)
+      |> check_if_won()
   end
   
   # handle an incorrect new guess
   defp handle_new_guess(game, guess, _incorrect_guess) do
-    game_update = %{
-      game |
-        game_state:  :bad_guess,
-        last_guess:  guess,
-        turns_left:  game.turns_left - 1,
-        used:        [guess | game.used]
+    game
+      |> update_game_state(guess, :bad_guess, game.turns_left - 1)
+      |> check_if_lost()
+  end
+  
+  
+  # update the game state
+  defp update_game_state(game, guess, state, turns) do
+    %{ game |
+         game_state:  state,
+         last_guess:  guess,
+         used:        [guess | game.used],
+         turns_left:  turns
     }
-    check_if_lost(game_update, 0 == game_update.turns_left)
   end
   
   
   # check if the user won
-  defp check_if_won(game, _all_guessed = true), do: %{game | game_state: :won}
-  defp check_if_won(game, _),                   do: game
+  defp check_if_won(game = %{answers: same, letters: same}) do
+    %{ game | game_state: :won }
+  end
+  
+  defp check_if_won(game) do  # not won yet
+    game
+  end
   
   
   # check if the user lost the game
-  defp check_if_lost(game, _no_turns_left = true) do
-    %{
-      game | 
-        game_state:  :lost, 
-        letters:     game.word_chars  # fill in all letters
+  defp check_if_lost(game = %{turns_left: 0}) do
+    %{ game | 
+         game_state:  :lost, 
+         letters:     game.answers  # fill in all letters
     }
   end
-  defp check_if_lost(game, _), do: game
+  
+  defp check_if_lost(game) do  # not lost yet
+    game
+  end
   
   
   # initialize the game letters
@@ -110,14 +122,13 @@ defmodule Hangman.Game do
   
   # reveal letters that match the guess
   def reveal_letters(game, guess) do
-    game.word_chars
-      |> letter_match(game.letters, guess)
+    %{ game | letters: letter_match(game.answers, game.letters, guess) }
   end
   
   
   # helper function to change letters that match the guess
-  defp letter_match([],       [],        _g), do: []
-  defp letter_match([g | t1], ["_" | t2], g), do: [g  | letter_match(t1, t2, g)]
-  defp letter_match([_ | t1], [h2  | t2], g), do: [h2 | letter_match(t1, t2, g)]
+  defp letter_match([],       [],      _g), do: []
+  defp letter_match([g | t1], [_ | t2], g), do: [g | letter_match(t1, t2, g)]
+  defp letter_match([_ | t1], [u | t2], g), do: [u | letter_match(t1, t2, g)]
   
 end
