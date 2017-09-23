@@ -26,7 +26,7 @@ defmodule Hangman.Mixfile do
       { 
         :dictionary, 
         path: "../dictionary" 
-      }
+      },
     ]
   end
 end
