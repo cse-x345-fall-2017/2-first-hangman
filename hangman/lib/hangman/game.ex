@@ -80,7 +80,7 @@ defmodule Hangman.Game do
   end
 
   # If lost then return then set the letters as list of word
-  defp replace_letters(%State{ game_state: :lost} = game, _) do
+  defp replace_letters(%State{ game_state: :lost } = game, _) do
     game.word
     |> to_list
   end
@@ -93,7 +93,7 @@ defmodule Hangman.Game do
   end
 
   # Set the letters that have not yet been guessed by an _ in appropriate positions
-  defp replace_letters(%State{ word: word}, used) do
+  defp replace_letters(%State{ word: word }, used) do
     word
     |> String.replace(~r/[^#{used}]/, "_")
     |> to_list
@@ -103,29 +103,35 @@ defmodule Hangman.Game do
   # Private Functions for make_move #
   ###################################
 
+  defp is_letter(letter) do
+    String.match?(letter, ~r/^[A-Za-z]$/)
+  end
+
   # check if guess is in used and handle the guess accordingly
   defp make_move_handler(%State{ used: used } = game, guess) do
-    handle_guess(game, guess in used, guess)
+    game = handle_guess(game, is_letter(guess), guess in used, guess)
+    { game, tally(game) }
   end
 
   # For fun
-  defp handle_guess(%State{ game_state: :lost} ,_, _turns) do
-    try do
-      throw("Game Over")
-    catch
-      _ -> "Game Over! You have lost all your turns."
-    end
+  defp handle_guess(%State{ game_state: :lost } = game , _, _, _) do
+    IO.puts("Game Over! Please start a new game!")
+    game
+  end
+
+  defp handle_guess(game, false, _, _) do
+    IO.puts("Invalid letter entered. Please try again!")
+    game
   end
 
   # If guess is in used, then set state to :already_used
-  defp handle_guess(game, true, _guess) do
-    game = %State{ game | game_state: :already_used }
-    { game, tally(game) }
+  defp handle_guess(game, true, true, _guess) do
+    %State{ game | game_state: :already_used }
   end
 
   # If guess is not in used, then check if guess is in the set of letters left
   # and handle accordingly
-  defp handle_guess(game, false, guess) do
+  defp handle_guess(game, true, false, guess) do
     handle_map(game, guess in game.left_letters_set, guess)
   end
 
@@ -157,29 +163,25 @@ defmodule Hangman.Game do
 
   # If number of turns is zero, then set the game_state to :lost and update letters
   defp handle_turns(game, 0) do
-    game = %State{ game | game_state: :lost,
-                          letters: game.word |> String.codepoints()
-           }
-    { game, tally(game) }
+    %State{ game |  game_state: :lost,
+                    letters:    game.word |> String.codepoints()
+    }
   end
 
   # If number of turns is greater than 0, then set the game_state to :bad_guess
   defp handle_turns(game, turns) when turns > 0 do
-    game = %State{ game | game_state: :bad_guess }
-    { game, tally(game) }
+    %State{ game | game_state: :bad_guess }
   end
 
   # Check if the set of letters left is none and set the game_state to :won
   defp handle_state(game, 0) do
-    game = %State{ game | game_state: :won }
-    { game, tally(game) }
+    %State{ game | game_state: :won }
   end
 
   # Check if there are any more in the set of letters left and 
   # set the game_state to :good_guess
   defp handle_state(game, _) do
-    game = %State{ game | game_state: :good_guess }
-    { game, tally(game) }
+    %State{ game | game_state: :good_guess }
   end
 
 end
