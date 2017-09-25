@@ -13,11 +13,11 @@ defmodule Hangman.Game do
    )
    
   end
-
-    
+  
+  
   # === PUBLIC FUNCTIONS ===================================================== #
-    
-    
+  
+  
   # create a new game
   def new_game do
     word = Dictionary.random_word()
@@ -52,30 +52,28 @@ defmodule Hangman.Game do
   # === PRIVATE FUNCTIONS ==================================================== #
   
   
-  # handle a move with an already used guess
+  # handle a guess entered by the user
   defp evaluate_guess(game, _guess, _already_used = true) do 
     %{ game | game_state: :already_used }
   end
   
-  # handle a move with a new guess
   defp evaluate_guess(game, guess, _new_guess) do
     handle_new_guess(game, guess, guess in game.answers)
   end
   
   
-  # handle a correct new guess
+  # handle new guesses
   defp handle_new_guess(game, guess, _correct_guess = true) do
     game
       |> update_game_state(guess, :good_guess, game.turns_left)
       |> reveal_letters(guess)
-      |> check_if_won()
+      |> check_game_result()
   end
-  
-  # handle an incorrect new guess
+
   defp handle_new_guess(game, guess, _incorrect_guess) do
     game
       |> update_game_state(guess, :bad_guess, game.turns_left - 1)
-      |> check_if_lost()
+      |> check_game_result()
   end
   
   
@@ -86,30 +84,24 @@ defmodule Hangman.Game do
          last_guess:  guess,
          used:        [guess | game.used],
          turns_left:  turns
-    }
+     }
   end
   
   
-  # check if the user won
-  defp check_if_won(game = %{answers: same, letters: same}) do
-    %{ game | game_state: :won }
-  end
-  
-  defp check_if_won(game) do  # not won yet
-    game
-  end
-  
-  
-  # check if the user lost the game
-  defp check_if_lost(game = %{turns_left: 0}) do
+  # check to see if the game is complete
+  defp check_game_result(game = %{turns_left: 0}) do
     %{ game | 
          game_state:  :lost, 
          letters:     game.answers  # fill in all letters
-    }
+     }
   end
   
-  defp check_if_lost(game) do  # not lost yet
-    game
+  defp check_game_result(game = %{letters: all, answers: all}) do
+    %{ game | game_state: :won }
+  end
+  
+  defp check_game_result(game) do
+    game  # game still continues
   end
   
   
