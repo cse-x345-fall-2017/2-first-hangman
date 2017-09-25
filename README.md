@@ -15,12 +15,13 @@ Hangman.make_move(game, guess)    # returns a tuple containing the updated game
 The `tally` is a map containing the following fields:
 
 ~~~ elixir
-game_state: # :won | :lost | :already_used | :good_guess | :bad_guess | :initializing
-turns_left: # the number of turns left (game starts with 7)
-letters:    # a list of single character strings. If a letter in a particular
-            # position has been guessed, that letter will appear in `letters`. 
-            # Otherwise, it will be shown as an underscore
-used:       # A sorted list of the letters already guessed
+game_state:    # :won | :lost | :already_used | :good_guess | :bad_guess | :initializing
+turns_left:    # the number of turns left (game starts with 7)
+letters:       # a list of single character strings. If a letter in a particular
+               # position has been guessed, that letter will appear in `letters`. 
+               # Otherwise, it will be shown as an underscore
+used:          # A sorted list of the letters already guessed
+last_guess:    # the last letter guessed by the player
 ~~~ 
 
 This tally is used by projects we'll be writing later. It allows them to display the
@@ -108,6 +109,9 @@ iex> tally
   Game structure and returns the map described above. Some fields are
   copied straight from the state to the tally, while others may need
   to be massaged a little.
+  
+* If the player has just won or lost, the `letters` field in the tally
+  should contain the full word (no underscores).
   
 * Finally it's time to implement `make_move()`. I love this kind of
   implementation because it gives me a lot of opportunities to use
