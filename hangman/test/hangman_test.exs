@@ -60,4 +60,10 @@ defmodule HangmanTest do
     assert game.state == :won
   end
 
+  test "letters updates" do
+    game = Hangman.new_game("dogs")
+    {game, tally} = Hangman.make_move(game, "c")
+    assert List.contains(game.letters, "c")
+  end
+
 end
