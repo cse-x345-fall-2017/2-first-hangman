@@ -103,13 +103,13 @@ defmodule Hangman.Game do
   # Private Functions for make_move #
   ###################################
 
-  defp is_letter(letter) do
+  defp is_letter?(letter) do
     String.match?(letter, ~r/^[A-Za-z]$/)
   end
 
   # check if guess is in used and handle the guess accordingly
   defp make_move_handler(%State{ used: used } = game, guess) do
-    game = handle_guess(game, is_letter(guess), guess in used, guess)
+    game = handle_guess(game, is_letter?(guess), guess in used, guess)
     { game, tally(game) }
   end
 
