@@ -3,7 +3,6 @@ defmodule Hangman.Game do
   defmodule State do
 
     #Struct for the state of the game
-
     defstruct(
       word:             "" ,
       game_state:       :initializing,
@@ -13,6 +12,7 @@ defmodule Hangman.Game do
       last_guess:       "",
       left_letters_set: MapSet.new()
     )
+
   end
 
   def new_game() do
@@ -28,11 +28,9 @@ defmodule Hangman.Game do
     make_move_handler(game, guess)
   end
 
-
   ###########################
   # End of public Functions #
   ###########################
-
 
   # Time for Private Functions
 
