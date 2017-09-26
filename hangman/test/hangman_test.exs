@@ -44,7 +44,7 @@ defmodule HangmanTest do
     assert :won == make_moves(g, left_letters_set, 0, MapSet.size(left_letters_set))
   end
 
-  test "check if letters are revealed after right guess" do
+  test "check if letters are revealed after right guess and, check if used and last_guess are updated" do
     g = %Hangman.Game.State{  game_state:       :initializing,
                               last_guess:       "",
                               left_letters_set: MapSet.new(["e", "s", "t"]),
@@ -52,7 +52,17 @@ defmodule HangmanTest do
                               turns_left:       7,
                               used:             [],
                               word:             "test" }
-    { _g, %{ letters: [ "_", "e", "_", "_" ], last_guess: "e" } } = Hangman.Game.make_move(g, "e")
+    { g, %{  letters: [ "_", "e", "_", "_" ],
+              last_guess: "e" ,
+              used: ["e"] } } = Hangman.Game.make_move(g, "e")
+
+    { g, %{ letters: [ "_", "e", "_", "_" ],
+            last_guess: "a" ,
+            used: [ "a", "e" ] } } = Hangman.Game.make_move(g, "a")
+
+    { _g, %{  letters: [ "t", "e", "_", "t" ],
+              last_guess: "t",
+              used: [ "a", "e", "t" ] } } = Hangman.Game.make_move(g, "t")
 
   end
 
