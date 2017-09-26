@@ -2,7 +2,8 @@ defmodule HangmanTest do
   use ExUnit.Case
   doctest Hangman
 
-  test "greets the world" do
-    assert Hangman.hello() == :world
+  test "creates new game" do
+    %{status: status} Hangman.new_game()
+    assert status == :initializing
   end
 end
