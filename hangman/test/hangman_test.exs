@@ -66,6 +66,10 @@ defmodule HangmanTest do
 
   end
 
+  ################################
+  # Helper functions for testing #
+  ################################
+
   defp make_moves(g, rest_set, counter, len) when counter < len do
     letter = Enum.fetch!(rest_set, 0)
     { g, _t } = Hangman.Game.make_move(g, letter)

@@ -20,7 +20,8 @@ defmodule Hangman.Game do
   end
 
   def tally(game) do
-    get_tally(game)
+    game
+    |> get_tally()
   end
 
   def make_move(game, guess) do
@@ -42,7 +43,7 @@ defmodule Hangman.Game do
   # Initilize the state of the game
   defp init_game() do
     word = Dictionary.random_word()
-    %State{ word: word, left_letters_set: get_letters_set(word) }
+    %State{ word: word, left_letters_set: word |> get_letters_set() }
   end
 
   # Converts the random word into the MapSet
@@ -104,13 +105,14 @@ defmodule Hangman.Game do
   ###################################
 
   defp is_letter?(letter) do
-    String.match?(letter, ~r/^[A-Za-z]$/)
+    letter
+    |> String.match?(~r/^[A-Za-z]$/)
   end
 
   # check if guess is in used and handle the guess accordingly
   defp make_move_handler(%State{ used: used } = game, guess) do
-    game = handle_guess(game, is_letter?(guess), guess in used, guess)
-    { game, tally(game) }
+    game = handle_guess(game, guess |> is_letter?(), guess in used, guess)
+    { game, game |> tally() }
   end
 
   # For fun
@@ -140,9 +142,8 @@ defmodule Hangman.Game do
   defp handle_map(game, true, guess) do
     game =  %State{ game |  last_guess:       guess,
                             used:             concat_and_sort(game.used, guess),
-                            left_letters_set: MapSet.delete(game.left_letters_set, guess)
-            }
-    handle_state(game, MapSet.size(game.left_letters_set))
+                            left_letters_set: MapSet.delete(game.left_letters_set, guess) }
+    handle_state(game, game.left_letters_set |> MapSet.size())
   end
 
   # If guess is not in set of letters left then update turns left and used and
@@ -150,8 +151,7 @@ defmodule Hangman.Game do
   defp handle_map(game, false, guess) do
     game = %State{ game | turns_left: game.turns_left - 1,
                           used:       concat_and_sort(game.used, guess),
-                          last_guess: guess
-           }
+                          last_guess: guess }
     handle_turns(game, game.turns_left)
   end
 
@@ -164,8 +164,7 @@ defmodule Hangman.Game do
   # If number of turns is zero, then set the game_state to :lost and update letters
   defp handle_turns(game, 0) do
     %State{ game |  game_state: :lost,
-                    letters:    game.word |> String.codepoints()
-    }
+                    letters:    game.word |> String.codepoints() }
   end
 
   # If number of turns is greater than 0, then set the game_state to :bad_guess
