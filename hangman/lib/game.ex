@@ -3,7 +3,8 @@ defmodule State do
      turns_left: 7,
      letters: [],
      used: [],
-     target: ""
+     target: "",
+     last_guess: ""
 end
 
 defmodule Hangman.Game do
@@ -20,11 +21,23 @@ defmodule Hangman.Game do
   end
 
   def tally(game) do
-
+    %{
+      game_state: game.game_state
+    }
   end
 
-  def make_move(game, guess)do
-    {1, 2}
+  def make_move(game, guess) when guess =~ Map.get(game, :target) do
+    new_game = %{
+      game
+    }
+    {game, Hangman.Game.tally(game)}
+  end
+
+  def make_move(game, guess) do
+    new_game = %{
+      game
+    }
+    {game, Hangman.Game.tally(game)}
   end
 
 end
