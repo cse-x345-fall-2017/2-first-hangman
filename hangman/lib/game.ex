@@ -23,8 +23,6 @@ defmodule Hangman.Game do
 
   def tally(game), do: Map.delete(game, :word)
 
-
-
   defp x_or_underscore(x, true), do: x
   defp x_or_underscore(_, false), do: "_"
   defp map_to_letters(word), do: List.duplicate("_", String.length(word))
@@ -33,10 +31,7 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
-  # Already used
-  defp make_guess(game, _, true, _) do
-    %{game | game_state: :already_used}
-  end
+  defp make_guess(game, _, true, _), do: %{game | game_state: :already_used}
 
   # Case where the user lost
   defp make_guess(game = %{turns_left: 1, used: used}, guess, false, false) do
