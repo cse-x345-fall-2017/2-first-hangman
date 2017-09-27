@@ -23,15 +23,7 @@ defmodule Hangman.Game do
 
   def tally(game), do: Map.delete(game, :word)
 
-  # Case where the user lost
-  defp bad_guess(game = %{turns_left: 1, used: used}, guess) do
-    %{game | turns_left: 0, used: used ++ [guess], game_state: :lost}
-  end
 
-  # Generic bad guess
-  defp bad_guess(game = %{used: used, turns_left: turns_left}, guess) do
-    %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
-  end
 
   defp x_or_underscore(x, true), do: x
   defp x_or_underscore(_, false), do: "_"
@@ -41,7 +33,22 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
-  defp good_guess(game = %{used: used, word: word}, guess) do
+  # Already used
+  defp make_guess(game, _, true, _) do
+    %{game | game_state: :already_used}
+  end
+
+  # Case where the user lost
+  defp make_guess(game = %{turns_left: 1, used: used}, guess, false, false) do
+    %{game | turns_left: 0, used: used ++ [guess], game_state: :lost}
+  end
+
+  # Generic bad guess
+  defp make_guess(game = %{used: used, turns_left: turns_left}, guess, false, false) do
+    %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
+  end
+
+  defp make_guess(game = %{used: used, word: word}, guess, false, true) do
     used = used ++ [guess]
     letters = map_to_letters(word, used)
     cond do
@@ -60,19 +67,8 @@ defmodule Hangman.Game do
 
   def make_move(game = %{used: used, word: word}, guess) do
     game = %{game | last_guess: guess}
-    cond do
-      guess in used ->
-        game = %{game | game_state: :already_used}
-        {game, Hangman.Game.tally(game)}
-
-      !String.contains?(word, guess) ->
-        game = bad_guess(game, guess)
-        {game, Hangman.Game.tally(game)}
-
-      String.contains?(word, guess) ->
-        game = good_guess(game, guess)
-        {game, Hangman.Game.tally(game)}
-    end
+    game = make_guess(game, guess, guess in used, String.contains?(word, guess))
+    {game, Hangman.Game.tally(game)}
   end
 
 end
