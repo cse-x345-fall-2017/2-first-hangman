@@ -32,6 +32,10 @@ defmodule Hangman.Game do
     %{game_state: game_state}
   end
 
+  defp bad_guess(game = %{turns_left: 1, used: used}, guess) do
+    %{game | turns_left: 0, used: used ++ [guess], game_state: :lost}
+  end
+
   defp bad_guess(game = %{used: used, turns_left: turns_left}, guess) do
     %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
@@ -53,6 +57,7 @@ defmodule Hangman.Game do
 
   # Is this good practice?  Should this fail?
   def make_move(game = %{turns_left: 0}, _) do
+    game = %{game | game_state: :lost}
     {game, Hangman.Game.tally(game)}
   end
 

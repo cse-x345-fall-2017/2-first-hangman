@@ -50,14 +50,14 @@ defmodule HangmanTest do
 
   test "loses the game" do
     game = Hangman.new_game("cats")
-    {game, _} = Hangman.make_move(game, "c")
-    {game, _} = Hangman.make_move(game, "w")
-    {game, _} = Hangman.make_move(game, "t")
     {game, _} = Hangman.make_move(game, "b")
     {game, _} = Hangman.make_move(game, "d")
     {game, _} = Hangman.make_move(game, "e")
     {game, _} = Hangman.make_move(game, "f")
-    assert game.game_state == :won
+    {game, _} = Hangman.make_move(game, "g")
+    {game, _} = Hangman.make_move(game, "h")
+    {%{game_state: game_state}, _} = Hangman.make_move(game, "i")
+    assert game_state == :lost
   end
 
   test "letters updates" do
