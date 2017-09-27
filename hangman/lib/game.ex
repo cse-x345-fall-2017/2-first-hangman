@@ -3,7 +3,7 @@ defmodule State do
      turns_left: 7,
      letters: [],
      used: [],
-     target: "",
+     word: "",
      last_guess: ""
 end
 
@@ -18,10 +18,10 @@ defmodule Hangman.Game do
 
   # Exists for testing purposes
   def new_game(word) do
-    %State{target: word, letters: map_to_letters(word)}
+    %State{word: word, letters: map_to_letters(word)}
   end
 
-  def tally(game), do: Map.delete(game, :target)
+  def tally(game), do: Map.delete(game, :word)
 
   # Case where the user lost
   defp bad_guess(game = %{turns_left: 1, used: used}, guess) do
@@ -41,9 +41,9 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
-  defp good_guess(game = %{used: used, target: target}, guess) do
+  defp good_guess(game = %{used: used, word: word}, guess) do
     used = used ++ [guess]
-    letters = map_to_letters(target, used)
+    letters = map_to_letters(word, used)
     cond do
       "_" in letters ->
         %{game | used: used, letters: letters, game_state: :good_guess}
@@ -58,18 +58,18 @@ defmodule Hangman.Game do
     {game, Hangman.Game.tally(game)}
   end
 
-  def make_move(game = %{used: used, target: target}, guess) do
+  def make_move(game = %{used: used, word: word}, guess) do
     game = %{game | last_guess: guess}
     cond do
       guess in used ->
         game = %{game | game_state: :already_used}
         {game, Hangman.Game.tally(game)}
 
-      !String.contains?(target, guess) ->
+      !String.contains?(word, guess) ->
         game = bad_guess(game, guess)
         {game, Hangman.Game.tally(game)}
 
-      String.contains?(target, guess) ->
+      String.contains?(word, guess) ->
         game = good_guess(game, guess)
         {game, Hangman.Game.tally(game)}
     end
