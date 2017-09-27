@@ -44,17 +44,17 @@ defmodule Hangman.Game do
     %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
 
-    defp make_guess(game = %{used: used, word: word}, guess, false, true) do
-      used = used ++ [guess]
-      letters = map_to_letters(word, used)
-      game |>
-      Map.replace(:used, used) |>
-      Map.replace(:letters, letters) |>
-      check_victory("_" in letters)
-    end
+  defp make_guess(game = %{used: used, word: word}, guess, false, true) do
+    used = used ++ [guess]
+    letters = map_to_letters(word, used)
+    game |>
+    Map.replace(:used, used) |>
+    Map.replace(:letters, letters) |>
+    check_victory("_" in letters)
+  end
+
   defp check_victory(game, false), do: %{game | game_state: :won}
   defp check_victory(game, true),  do: %{game | game_state: :good_guess}
-
 
   # Is this good practice?  Should this fail?
   def make_move(game = %{turns_left: 0}, _) do
