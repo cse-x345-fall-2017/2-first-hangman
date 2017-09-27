@@ -17,7 +17,7 @@ defmodule HangmanTest do
 
   test "makes a move" do
     game = Hangman.new_game()
-    {game, _} = Hangman.make_move(game, "a")
+    {_ , _} = Hangman.make_move(game, "a")
   end
 
   test "makes a move twice" do
