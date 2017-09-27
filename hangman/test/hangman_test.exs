@@ -61,9 +61,9 @@ defmodule HangmanTest do
   end
 
   test "letters updates" do
-    game = Hangman.new_game("dogs")
-    {game, _} = Hangman.make_move(game, "c")
-    assert List.contains?(game.letters, "c")
+    game = Hangman.new_game("cats")
+    {%{letters: letters}, _} = Hangman.make_move(game, "c")
+    assert "c" in letters
   end
 
 end
