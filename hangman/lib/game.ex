@@ -13,22 +13,15 @@ defmodule Hangman.Game do
   """
 
   def new_game() do
-    word = Dictionary.random_word()
-    %State{
-      target:  word,
-      letters: List.duplicate("_", String.length(word))
-    }
+    new_game(Dictionary.random_word())
   end
 
   # Exists for testing purposes
   def new_game(word) do
-    %State{
-      target:  word,
-      letters: List.duplicate("_", String.length(word))
-    }
+    %State{target:  word, letters: List.duplicate("_", String.length(word))}
   end
 
-  def tally(_ = %{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}) do
+  def tally(%{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}) do
     %{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}
   end
 
