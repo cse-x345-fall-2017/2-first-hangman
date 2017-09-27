@@ -31,6 +31,7 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
+
   defp make_guess(game, _, true, _), do: %{game | game_state: :already_used}
 
   # Case where the user lost
@@ -43,15 +44,16 @@ defmodule Hangman.Game do
     %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
 
+  defp check_victory(game, false), do: %{game | game_state: :won}
+  defp check_victory(game, true),  do: %{game | game_state: :good_guess}
+
   defp make_guess(game = %{used: used, word: word}, guess, false, true) do
     used = used ++ [guess]
     letters = map_to_letters(word, used)
-    cond do
-      "_" in letters ->
-        %{game | used: used, letters: letters, game_state: :good_guess}
-      true ->
-        %{game | used: used, letters: letters, game_state: :won}
-    end
+    game |>
+    Map.replace(:used, used) |>
+    Map.replace(:letters, letters) |>
+    check_victory("_" in letters)
   end
 
   # Is this good practice?  Should this fail?
