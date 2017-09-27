@@ -18,7 +18,7 @@ defmodule Hangman.Game do
 
   # Exists for testing purposes
   def new_game(word) do
-    %State{target:  word, letters: List.duplicate("_", String.length(word))}
+    %State{target: word, letters: List.duplicate("_", String.length(word))}
   end
 
   def tally(game), do: Map.delete(game, :target)
@@ -33,14 +33,9 @@ defmodule Hangman.Game do
     %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
 
-  defp map_to_letters_or_underscore(x, used) do
-    cond do
-      x in used ->
-        x
-      true ->
-        "_"
-    end
-  end
+  def x_or_underscore(x, true), do: x
+  def x_or_underscore(_, false), do: "_"
+  defp map_to_letters_or_underscore(x, used),do: x_or_underscore(x, x in used)
 
   defp good_guess(game = %{used: used, target: target}, guess) do
     used = used ++ [guess]
