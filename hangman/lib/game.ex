@@ -28,17 +28,26 @@ defmodule Hangman.Game do
     }
   end
 
-  def tally(game) do
-    %{
-      game_state: game.game_state
-    }
+  def tally(%{game_state: game_state}) do
+    %{game_state: game_state}
   end
 
-  def make_move(game = %{used: used}, guess) do
-    {%{game | game_state: :already_used}, Hangman.Game.tally(game)}
+  defp bad_guess(game = %{used: used, turns_left: turns_left}, guess) do
+    %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
 
-  def make_move(game = %{target: target}, guess) do
+  def make_move(game = %{turns_left: 0}, guess) do
     {game, Hangman.Game.tally(game)}
   end
+
+  def make_move(game = %{used: used, target: target}, guess) do
+    cond do
+      guess in used ->
+        game = %{game | game_state: :already_used}
+      !String.contains?(target, guess) ->
+        game = bad_guess(game, guess)
+    end
+    {game, tally(game)}
+  end
+
 end
