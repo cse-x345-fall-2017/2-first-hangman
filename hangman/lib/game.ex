@@ -21,14 +21,14 @@ defmodule Hangman.Game do
     %State{target:  word, letters: List.duplicate("_", String.length(word))}
   end
 
-  def tally(%{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}) do
-    %{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}
-  end
+  def tally(game), do: Map.delete(game, :target)
 
+  # Case where the user lost
   defp bad_guess(game = %{turns_left: 1, used: used}, guess) do
     %{game | turns_left: 0, used: used ++ [guess], game_state: :lost}
   end
 
+  # Generic bad guess
   defp bad_guess(game = %{used: used, turns_left: turns_left}, guess) do
     %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
