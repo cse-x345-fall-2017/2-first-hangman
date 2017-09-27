@@ -28,8 +28,8 @@ defmodule Hangman.Game do
     }
   end
 
-  def tally(_ = %{game_state: game_state}) do
-    %{game_state: game_state}
+  def tally(_ = %{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}) do
+    %{game_state: game_state, turns_left: turns_left, letters: letters, used: used, last_guess: last_guess}
   end
 
   defp bad_guess(game = %{turns_left: 1, used: used}, guess) do
@@ -62,6 +62,7 @@ defmodule Hangman.Game do
   end
 
   def make_move(game = %{used: used, target: target}, guess) do
+    game = %{game | last_guess: guess}
     cond do
       guess in used ->
         game = %{game | game_state: :already_used}
