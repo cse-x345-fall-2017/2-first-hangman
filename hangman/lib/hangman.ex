@@ -3,16 +3,10 @@ defmodule Hangman do
   Documentation for Hangman.
   """
 
-  @doc """
-  Hello world.
+  defstruct turns_left: 7, game_state: :initializing,
+            word: "", used: [], last_guess: ''
 
-  ## Examples
-
-      iex> Hangman.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def new_game do
+    %Hangman{ word: Dictionary.random_word() }
   end
 end
