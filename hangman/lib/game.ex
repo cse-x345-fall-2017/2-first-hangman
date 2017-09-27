@@ -52,7 +52,12 @@ defmodule Hangman.Game do
   defp good_guess(game = %{used: used, target: target}, guess) do
     used = used ++ [guess]
     letters = Enum.map(String.graphemes(target), fn(x) -> map_to_letters_or_underscore(x, used) end)
-    %{game | used: used, letters: letters, game_state: :good_guess}
+    cond do
+      "_" in letters ->
+        %{game | used: used, letters: letters, game_state: :good_guess}
+      true ->
+        %{game | used: used, letters: letters, game_state: :won}
+    end
   end
 
   # Is this good practice?  Should this fail?
