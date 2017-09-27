@@ -17,53 +17,53 @@ defmodule HangmanTest do
 
   test "makes a move" do
     game = Hangman.new_game()
-    {game, tally} = Hangman.make_move(game, "a")
+    {game, _} = Hangman.make_move(game, "a")
   end
 
   test "makes a move twice" do
     game = Hangman.new_game()
-    {game, tally} = Hangman.make_move(game, "a")
-    {game, tally} = Hangman.make_move(game, "a")
-    assert game.state == :already_used
+    {game, _} = Hangman.make_move(game, "a")
+    {game, _} = Hangman.make_move(game, "a")
+    assert game.game_state == :already_used
   end
 
   test "makes a good guess" do
     game = Hangman.new_game("cats")
-    {game, tally} = Hangman.make_move(game, "a")
-    assert game.state == :good_guess
+    {%{game_state: game_state}, _} = Hangman.make_move(game, "a")
+    assert game_state == :good_guess
   end
 
   test "makes a bad guess" do
     game = Hangman.new_game("cats")
-    {game, tally} = Hangman.make_move(game, "z")
-    assert game.state == :bad_guess
+    {game, _} = Hangman.make_move(game, "z")
+    assert game.game_state == :bad_guess
   end
 
   test "wins the game" do
     game = Hangman.new_game("cats")
-    {game, tally} = Hangman.make_move(game, "c")
-    {game, tally} = Hangman.make_move(game, "a")
-    {game, tally} = Hangman.make_move(game, "t")
-    {game, tally} = Hangman.make_move(game, "s")
-    assert game.state == :won
+    {game, _} = Hangman.make_move(game, "c")
+    {game, _} = Hangman.make_move(game, "a")
+    {game, _} = Hangman.make_move(game, "t")
+    {game, _} = Hangman.make_move(game, "s")
+    assert game.game_state == :won
   end
 
   test "loses the game" do
     game = Hangman.new_game("cats")
-    {game, tally} = Hangman.make_move(game, "c")
-    {game, tally} = Hangman.make_move(game, "w")
-    {game, tally} = Hangman.make_move(game, "t")
-    {game, tally} = Hangman.make_move(game, "b")
-    {game, tally} = Hangman.make_move(game, "d")
-    {game, tally} = Hangman.make_move(game, "e")
-    {game, tally} = Hangman.make_move(game, "f")
-    assert game.state == :won
+    {game, _} = Hangman.make_move(game, "c")
+    {game, _} = Hangman.make_move(game, "w")
+    {game, _} = Hangman.make_move(game, "t")
+    {game, _} = Hangman.make_move(game, "b")
+    {game, _} = Hangman.make_move(game, "d")
+    {game, _} = Hangman.make_move(game, "e")
+    {game, _} = Hangman.make_move(game, "f")
+    assert game.game_state == :won
   end
 
   test "letters updates" do
     game = Hangman.new_game("dogs")
-    {game, tally} = Hangman.make_move(game, "c")
-    assert List.contains(game.letters, "c")
+    {game, _} = Hangman.make_move(game, "c")
+    assert List.contains?(game.letters, "c")
   end
 
 end

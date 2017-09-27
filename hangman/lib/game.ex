@@ -28,7 +28,7 @@ defmodule Hangman.Game do
     }
   end
 
-  def tally(%{game_state: game_state}) do
+  def tally(_ = %{game_state: game_state}) do
     %{game_state: game_state}
   end
 
@@ -36,7 +36,23 @@ defmodule Hangman.Game do
     %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
   end
 
-  def make_move(game = %{turns_left: 0}, guess) do
+  defp map_to_letters_or_underscore(x, used) do
+    cond do
+      x in used ->
+        x
+      true ->
+        "_"
+    end
+  end
+
+  defp good_guess(game = %{used: used, target: target}, guess) do
+    used = used ++ [guess]
+    letters = Enum.map(String.graphemes(target), fn(x) -> map_to_letters_or_underscore(x, used) end)
+    %{game | used: used, letters: letters, game_state: :good_guess}
+  end
+
+  # Is this good practice?  Should this fail?
+  def make_move(game = %{turns_left: 0}, _) do
     {game, Hangman.Game.tally(game)}
   end
 
@@ -44,10 +60,16 @@ defmodule Hangman.Game do
     cond do
       guess in used ->
         game = %{game | game_state: :already_used}
+        {game, Hangman.Game.tally(game)}
+
       !String.contains?(target, guess) ->
         game = bad_guess(game, guess)
+        {game, Hangman.Game.tally(game)}
+
+      String.contains?(target, guess) ->
+        game = good_guess(game, guess)
+        {game, Hangman.Game.tally(game)}
     end
-    {game, tally(game)}
   end
 
 end
