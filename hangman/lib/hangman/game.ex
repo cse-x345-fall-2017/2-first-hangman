@@ -47,7 +47,7 @@ defmodule Hangman.Game do
   defp init_game(word \\ Dictionary.random_word()) do
     %State{ word:             word,
             left_letters_set: word |> get_letters_set(),
-            letters:          replace_letters(word, []) }
+            letters:          replace_letters(word, [])}
   end
 
   # Converts the random word into the MapSet
@@ -66,14 +66,15 @@ defmodule Hangman.Game do
                     game_state: state,
                     turns_left: turns_left,
                     last_guess: last_guess,
-                    used:       used
-                  } = game) do
+                    used:       used,
+                    letters:    letters
+                  }) do
     %{
       game_state: state,
       turns_left: turns_left,
       used:       used,
       last_guess: last_guess,
-      letters:    replace_letters(game, used)
+      letters:    letters
     }
   end
 
@@ -90,7 +91,7 @@ defmodule Hangman.Game do
     |> to_list
   end
 
-  # Set all the letters in the word by an _. Used when game is initialized i.e., when used is empty. 
+  # Set all the letters in the word by an _. Used when game is initialized i.e., when used is empty.
   defp replace_letters(word, []) do
     word
     |> String.replace(~r/\w/, "_")
@@ -144,17 +145,21 @@ defmodule Hangman.Game do
   # If guess is in set of letters left then update used and set of left letters 
   # Also has to checked if the game is won and set game_state accordingly
   defp handle_map(game, true, guess) do
+    used = concat_and_sort(game.used, guess)
     game =  %State{ game |  last_guess:       guess,
-                            used:             concat_and_sort(game.used, guess),
+                            used:             used,
+                            letters: replace_letters(game, used),
                             left_letters_set: MapSet.delete(game.left_letters_set, guess) }
-    handle_state(game, game.left_letters_set |> MapSet.size())
+    handle_state( game, game.left_letters_set |> MapSet.size())
   end
 
   # If guess is not in set of letters left then update turns left and used and
   # check if the state is :bad_guess or :lost
   defp handle_map(game, false, guess) do
+    used = concat_and_sort(game.used, guess)
     game = %State{ game | turns_left: game.turns_left - 1,
-                          used:       concat_and_sort(game.used, guess),
+                          used:       used,
+                          letters: replace_letters(game, game.used),
                           last_guess: guess }
     handle_turns(game, game.turns_left)
   end
