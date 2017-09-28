@@ -5,7 +5,7 @@ defmodule Hangman.Game do
         game_status: :initializing,
         word: [],
         hidden: [],
-        used: [],
+        used: MapSet.new,
         last_guess: ""
     )
 
@@ -43,28 +43,61 @@ defmodule Hangman.Game do
 #####################################################################
 
     def make_move(game, guess) do
-        %{word: w, hidden: h, used: u} = game
-        found_i = Enum.map(w, fn(letter) -> letter == guess end)
 
-        Map.put(%{game | 
-            game_status: check_stat(game,found_i),
-            turns_left: check_turns(found_i),
-            hidden: check_hidden(h,found_i),
-            used: [u | guess],
-            last_guess: guess
-            })
+        %{word: w, hidden: h, used: u, turns_left: tl} = game
+
+        {game_status, new_h} = guess_attempt(
+            Enum.any?(w,fn(x) -> x == guess end),
+            Enum.any?(u,fn(x) -> x == guess end),
+            w,
+            h,
+            guess
+            )
+
+        {game_status, tl} = game_check(game_status, tl <= 1,tl, w == new_h)
+
+        {
+            %{ 
+                game_status: game_status,
+                turns_left: tl,
+                word: w,
+                hidden: new_h,
+                used: MapSet.union([guess] |> Enum.into(MapSet.new), u),
+                last_guess: guess
+            },
+            %{
+                game_status: game_status,
+                turns_left: tl,
+                hidden: new_h,
+                used: MapSet.union([guess] |> Enum.into(MapSet.new), u),
+                last_guess: guess
+            }
+        }
     end
 
-    defp check_stat(game, found_i) do
+    defp guess_attempt(_    , true, _, h, _    ), do: {:already_used, h}
+    defp guess_attempt(false, _    , _, h, _    ), do: {:bad_guess, h}
+    defp guess_attempt(true , false, w, h, guess), do: insert_guess(w,h,guess, true)
 
+    #:good_guess passed, function below will always insert into
+    #hidden field at least once
+
+    defp insert_guess(_, h, _    , nil), do: {:good_guess, h}
+    defp insert_guess(w, h, guess, _) do 
+        index = Enum.find_index(w, fn(x) -> x == guess end)
+        h = List.replace_at(h, index, guess)
+        {_, w} = List.pop_at(w,index)
+        insert_guess(w, h, guess, Enum.find_index(w, fn(x) -> x == guess end))
     end
 
-    defp check_turns(found_i) do
+    defp game_check(:already_used,_, tl, _),    do: {:already_used, tl}
 
-    end
+    defp game_check(:bad_guess,false, tl, _),   do: {:bad_guess, tl-1}
+    defp game_check(:bad_guess,true, tl, _),    do: {:lost, tl-1}
 
-    defp check_hidden(hidden, found_i) do
+    defp game_check(:good_guess, _, tl, false), do: {:good_guess, tl}
+    defp game_check(:good_guess, _, tl, true),  do: {:won, tl}
+    
 
-    end
 
 end
