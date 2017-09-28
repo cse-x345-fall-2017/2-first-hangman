@@ -20,32 +20,32 @@ defmodule Hangman.Game do
     |> Map.delete(:word)
   end
 
-  def decrement(x) do
+  defp decrement(x) do
     x - 1
   end
 
-  def update_if_won(state, true) do
+  defp update_if_won(state, true) do
     %{ state | game_state: :won }
   end
-  def update_if_won(state, false) do
+  defp update_if_won(state, false) do
     state
   end
 
-  def letter_display(letter, true) do
+  defp letter_display(letter, true) do
     letter
   end
-  def letter_display(_, false) do
+  defp letter_display(_, false) do
     "_"
   end
 
-  def update_letters(state) do
+  defp update_letters(state) do
     letters = state.word
     |> String.codepoints
     |> Enum.map(&(letter_display(&1, &1 in state.used)))
     Map.put(state, :letters, letters)
   end
 
-  def update_state(state, letter) do
+  defp update_state(state, letter) do
     state
     |> Map.put(:used, [ letter | state.used])
     |> Map.put(:last_guess, letter)
