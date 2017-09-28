@@ -99,7 +99,7 @@ defmodule Hangman.Game do
   end
 
   # Set the letters that have not yet been guessed by an _ in appropriate positions
-  defp replace_letters(%State{ word: word }, used) do
+  defp replace_letters(word, used) do
     word
     |> String.replace(~r/[^#{used}]/, "_")
     |> to_list
@@ -142,7 +142,7 @@ defmodule Hangman.Game do
     used = concat_and_sort(game.used, guess)
     game =  %State{ game |  last_guess: guess,
                             used:       used,
-                            letters:    replace_letters(game, used) }
+                            letters:    replace_letters(game.word, used) }
     handle_map(game, guess in game.left_letters_set, guess)
   end
 
