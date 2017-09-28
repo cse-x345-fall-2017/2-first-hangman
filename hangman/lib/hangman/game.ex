@@ -59,24 +59,24 @@ defmodule Hangman.Game do
   end
 
   # Letter already used
-  def _make_move(state, _, _, letter_in_used=true) do
+  def _make_move(state, _, _, true) do
     %{ state | game_state: :already_used }
   end
 
   # Last turn and letter not in word
-  def _make_move(state=%{ turns_left: 1 }, letter, letter_in_word=false, _) do
+  def _make_move(state=%{ turns_left: 1 }, _, false, _) do
     %{ state | game_state: :lost, turns_left: 0}
   end
 
   # Letter not in word
-  def _make_move(state, letter, letter_in_word=false, _) do
+  def _make_move(state, letter, false, _) do
     %{ state | game_state: :bad_guess }
     |> Map.update!(:turns_left, &decrement/1)
     |> update_state(letter)
   end
 
   # Letter in word
-  def _make_move(state, letter, letter_in_word=true, _) do
+  def _make_move(state, letter, true, _) do
     state = %{ state | game_state: :good_guess }
     |> update_state(letter)
 
