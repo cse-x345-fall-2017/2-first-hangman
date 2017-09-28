@@ -139,28 +139,24 @@ defmodule Hangman.Game do
   # If guess is not in used, then check if guess is in the set of letters left
   # and handle accordingly
   defp handle_guess(game, true, false, guess) do
+    used = concat_and_sort(game.used, guess)
+    game =  %State{ game |  last_guess: guess,
+                            used:       used,
+                            letters:    replace_letters(game, used) }
     handle_map(game, guess in game.left_letters_set, guess)
   end
 
   # If guess is in set of letters left then update used and set of left letters 
   # Also has to checked if the game is won and set game_state accordingly
   defp handle_map(game, true, guess) do
-    used = concat_and_sort(game.used, guess)
-    game =  %State{ game |  last_guess:       guess,
-                            used:             used,
-                            letters: replace_letters(game, used),
-                            left_letters_set: MapSet.delete(game.left_letters_set, guess) }
+    game =  %State{ game | left_letters_set: MapSet.delete(game.left_letters_set, guess) }
     handle_state( game, game.left_letters_set |> MapSet.size())
   end
 
   # If guess is not in set of letters left then update turns left and used and
   # check if the state is :bad_guess or :lost
-  defp handle_map(game, false, guess) do
-    used = concat_and_sort(game.used, guess)
-    game = %State{ game | turns_left: game.turns_left - 1,
-                          used:       used,
-                          letters: replace_letters(game, game.used),
-                          last_guess: guess }
+  defp handle_map(game, false, _guess) do
+    game = %State{ game | turns_left: game.turns_left - 1 }
     handle_turns(game, game.turns_left)
   end
 
