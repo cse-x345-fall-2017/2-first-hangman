@@ -45,13 +45,7 @@ defmodule Hangman.GameTest do
   end
 
   test "check if letters are revealed after right guess and, check if used and last_guess are updated" do
-    g = %Hangman.Game.State{  game_state:       :initializing,
-      last_guess:       "",
-      left_letters_set: MapSet.new(["e", "s", "t"]),
-      letters:          [],
-      turns_left:       7,
-      used:             [],
-      word:             "test" }
+    g = Hangman.Game.new_game("test")
     { g, %{  letters: [ "_", "e", "_", "_" ],
       last_guess: "e" ,
       used: ["e"] } } = Hangman.Game.make_move(g, "e")

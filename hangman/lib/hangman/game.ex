@@ -19,6 +19,11 @@ defmodule Hangman.Game do
     init_game()
   end
 
+  def new_game(word) do
+    word
+    |> init_game()
+  end
+
   def tally(game) do
     game
     |> get_tally()
@@ -39,9 +44,10 @@ defmodule Hangman.Game do
   ##################################
   
   # Initilize the state of the game
-  defp init_game() do
-    word = Dictionary.random_word()
-    %State{ word: word, left_letters_set: word |> get_letters_set() }
+  defp init_game(word \\ Dictionary.random_word()) do
+    %State{ word:             word,
+            left_letters_set: word |> get_letters_set(),
+            letters:          replace_letters(word, []) }
   end
 
   # Converts the random word into the MapSet
@@ -85,7 +91,7 @@ defmodule Hangman.Game do
   end
 
   # Set all the letters in the word by an _. Used when game is initialized i.e., when used is empty. 
-  defp replace_letters(%State{ word: word }, []) do
+  defp replace_letters(word, []) do
     word
     |> String.replace(~r/\w/, "_")
     |> to_list
