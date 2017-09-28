@@ -12,22 +12,14 @@ defmodule Hangman.Game do
 #####################################################################
 
     def new_game() do
-        new_word = get_word()
+        new_word = Dictionary.random_word()
+        |> String.trim("\r")
+        |> String.graphemes()
 
         %Hangman.Game{
             word: new_word, 
-            letters: get_letters(new_word)
+            letters: List.duplicate("_",length(new_word))
         }
-    end
-
-    defp get_word() do
-        Dictionary.random_word()
-        |> String.trim("\r")
-        |> String.graphemes()
-    end
-
-    defp get_letters(word) do
-        List.duplicate("_",length(word))
     end
 
 #####################################################################
@@ -80,25 +72,27 @@ defmodule Hangman.Game do
         }
     end
 
-    defp guess_attempt(_    , true , _, h, _    ), do: {:already_used, h}
-    defp guess_attempt(false, _    , _, h, _    ), do: {:bad_guess, h}
-    defp guess_attempt(true , false, w, h, guess), do: insert_guess(w,h,guess, true)
+    defp guess_attempt(_, true, _, h, _),         do: {:already_used, h}
+    defp guess_attempt(false, _, _, h, _),        do: {:bad_guess, h}
+    defp guess_attempt(true, false, w, h, guess), do: insert_guess(w,h,guess, true)
 
     #:good_guess passed, function below will always insert into
     #letters field at least once
 
     defp insert_guess(_, h, _    , nil), do: {:good_guess, h}
     defp insert_guess(w, h, guess, _) do 
+
         index = Enum.find_index(w, fn(x) -> x == guess end)
         h = List.replace_at(h, index, guess)
         {_, w} = List.pop_at(w,index)
         insert_guess(w, h, guess, Enum.find_index(w, fn(x) -> x == guess end))
+        
     end
 
-    defp game_check(:already_used,_, tl, _),    do: {:already_used, tl}
+    defp game_check(:already_used, _, tl, _),   do: {:already_used, tl}
 
-    defp game_check(:bad_guess,false, tl, _),   do: {:bad_guess, tl-1}
-    defp game_check(:bad_guess,true, tl, _),    do: {:lost, tl-1}
+    defp game_check(:bad_guess, false, tl, _),  do: {:bad_guess, tl-1}
+    defp game_check(:bad_guess, true, tl, _),   do: {:lost, tl-1}
 
     defp game_check(:good_guess, _, tl, false), do: {:good_guess, tl}
     defp game_check(:good_guess, _, tl, true),  do: {:won, tl}
