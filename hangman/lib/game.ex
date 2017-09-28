@@ -31,7 +31,6 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
-
   defp make_guess(game, _, true, _), do: %{game | game_state: :already_used}
 
   # Case where the user lost
