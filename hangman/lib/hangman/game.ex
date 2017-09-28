@@ -52,9 +52,14 @@ defmodule Hangman.Game do
             w,
             h,
             guess
-            )
+        )
 
-        {game_status, tl} = game_check(game_status, tl <= 1,tl, w == new_h)
+        {game_status, tl} = game_check(
+            game_status,
+            tl <= 1,
+            tl,
+            w == new_h
+        )
 
         {
             %{ 
