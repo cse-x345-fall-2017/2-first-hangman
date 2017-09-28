@@ -2,9 +2,9 @@ defmodule Hangman.Game do
 
     defstruct(
         turns_left: 7, 
-        game_status: :initializing,
+        game_state: :initializing,
         word: [],
-        hidden: [],
+        letters: [],
         used: MapSet.new,
         last_guess: ""
     )
@@ -16,7 +16,7 @@ defmodule Hangman.Game do
 
         %Hangman.Game{
             word: new_word, 
-            hidden: get_hidden(new_word)
+            letters: get_letters(new_word)
         }
     end
 
@@ -26,14 +26,14 @@ defmodule Hangman.Game do
         |> String.graphemes()
     end
 
-    defp get_hidden(word) do
+    defp get_letters(word) do
         List.duplicate("_",length(word))
     end
 
 #####################################################################
 
     def tally(game) do 
-        %{game_status: status, turns_left: left, hidden: h,
+        %{game_state: status, turns_left: left, letters: h,
             used: u, last_guess: g} = game
 
         %{game_state: status, turns_left: left, letters: h,
@@ -44,9 +44,9 @@ defmodule Hangman.Game do
 
     def make_move(game, guess) do
 
-        %{word: w, hidden: h, used: u, turns_left: tl} = game
+        %{word: w, letters: h, used: u, turns_left: tl} = game
 
-        {game_status, new_h} = guess_attempt(
+        {game_state, new_h} = guess_attempt(
             Enum.any?(w,fn(x) -> x == guess end),
             Enum.any?(u,fn(x) -> x == guess end),
             w,
@@ -54,8 +54,8 @@ defmodule Hangman.Game do
             guess
         )
 
-        {game_status, tl} = game_check(
-            game_status,
+        {game_state, tl} = game_check(
+            game_state,
             tl <= 1,
             tl,
             w == new_h
@@ -63,29 +63,29 @@ defmodule Hangman.Game do
 
         {
             %{ 
-                game_status: game_status,
+                game_state: game_state,
                 turns_left: tl,
                 word: w,
-                hidden: new_h,
+                letters: new_h,
                 used: MapSet.union([guess] |> Enum.into(MapSet.new), u),
                 last_guess: guess
             },
             %{
-                game_status: game_status,
+                game_state: game_state,
                 turns_left: tl,
-                hidden: new_h,
+                letters: new_h,
                 used: MapSet.union([guess] |> Enum.into(MapSet.new), u),
                 last_guess: guess
             }
         }
     end
 
-    defp guess_attempt(_    , true, _, h, _    ), do: {:already_used, h}
+    defp guess_attempt(_    , true , _, h, _    ), do: {:already_used, h}
     defp guess_attempt(false, _    , _, h, _    ), do: {:bad_guess, h}
     defp guess_attempt(true , false, w, h, guess), do: insert_guess(w,h,guess, true)
 
     #:good_guess passed, function below will always insert into
-    #hidden field at least once
+    #letters field at least once
 
     defp insert_guess(_, h, _    , nil), do: {:good_guess, h}
     defp insert_guess(w, h, guess, _) do 

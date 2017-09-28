@@ -42,7 +42,7 @@ defmodule HumanPlayer.Impl do
   end
 
   def get_guess(state = %{ used: used }) do
-    if length(used) > 0 do
+    if MapSet.size(used) > 0 do
       IO.puts "Letters used so far: #{ used |> Enum.join(", ")}"
     end
     guess_until_valid(state)
