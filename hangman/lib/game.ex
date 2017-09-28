@@ -31,6 +31,10 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
+  defp decrement_terms(game) do
+    Map.update!(game, :turns_left, &(&1 - 1))
+  end
+
   defp make_guess(game, _, true, _), do: %{game | game_state: :already_used}
 
   # Case where the user lost
@@ -39,8 +43,8 @@ defmodule Hangman.Game do
   end
 
   # Generic bad guess
-  defp make_guess(game = %{used: used, turns_left: turns_left}, guess, false, false) do
-    %{game | turns_left: turns_left-1, used: used ++ [guess], game_state: :bad_guess}
+  defp make_guess(game = %{used: used}, guess, false, false) do
+    %{decrement_terms(game) | used: used ++ [guess], game_state: :bad_guess}
   end
 
   defp make_guess(game = %{used: used, word: word}, guess, false, true) do
