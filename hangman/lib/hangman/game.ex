@@ -20,13 +20,9 @@ defmodule Hangman.Game do
   
   # create a new game
   def new_game do
-    word = Dictionary.random_word()
+    Dictionary.random_word()
       |> String.trim() # "\r" is showing up on my windows machine, so remove it
-      
-    %GameState{
-      letters:  init_letters(word),
-      answers:  String.codepoints(word)
-    }
+      |> init_game_state()
   end
   
   
@@ -49,7 +45,24 @@ defmodule Hangman.Game do
   end
   
   
+  # === TEST FUNCTIONS ======================================================= #
+  
+  
+  # testing function for initializing a new game with a specified word
+  def new_game_test(word) do
+    init_game_state(word)
+  end
+  
+  
   # === PRIVATE FUNCTIONS ==================================================== #
+  
+  
+  defp init_game_state(word) do
+    %GameState{
+      letters:  List.duplicate("_", String.length(word)),
+      answers:  String.codepoints(word)
+    }
+  end
   
   
   # handle a guess entered by the user
@@ -84,7 +97,7 @@ defmodule Hangman.Game do
          last_guess:  guess,
          used:        [guess | game.used],
          turns_left:  turns
-     }
+    }
   end
   
   
@@ -93,7 +106,7 @@ defmodule Hangman.Game do
     %{ game | 
          game_state:  :lost, 
          letters:     game.answers  # fill in all letters
-     }
+    }
   end
   
   defp check_game_result(game = %{letters: all, answers: all}) do
@@ -102,13 +115,6 @@ defmodule Hangman.Game do
   
   defp check_game_result(game) do
     game  # game still continues
-  end
-  
-  
-  # initialize the game letters
-  defp init_letters(word) do
-    String.codepoints(word)
-      |> Enum.map(fn (_char) -> "_" end) # replace all with underscore
   end
   
   
