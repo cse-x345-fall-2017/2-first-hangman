@@ -46,10 +46,13 @@ defmodule Hangman.Game do
   end
 
   defp update_state(state, letter) do
-    state
+    state = state
     |> Map.put(:used, [ letter | state.used])
     |> Map.put(:last_guess, letter)
     |> update_letters
+
+    won = Enum.all?(state.letters, &(&1 != "_"))
+    state |> update_if_won(won)
   end
 
 
@@ -75,9 +78,6 @@ defmodule Hangman.Game do
   def make_move(state, letter, true, _) do
     state = %{ state | game_state: :good_guess }
     |> update_state(letter)
-
-    won = Enum.all?(state.letters, &(&1 != "_"))
-    state |> update_if_won(won)
   end
   def make_move(state, letter) do
     letter_in_word = letter in String.codepoints(state.word)
