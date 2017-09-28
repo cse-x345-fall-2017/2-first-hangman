@@ -79,15 +79,16 @@ defmodule Hangman.Game do
     #:good_guess passed, function below will always insert into
     #letters field at least once
 
-    defp insert_guess(_, h, _    , nil), do: {:good_guess, h}
     defp insert_guess(w, h, guess, _) do 
-
+    
         index = Enum.find_index(w, fn(x) -> x == guess end)
+
         h = List.replace_at(h, index, guess)
         {_, w} = List.pop_at(w,index)
+
         insert_guess(w, h, guess, Enum.find_index(w, fn(x) -> x == guess end))
-        
     end
+    defp insert_guess(_, h, _    , nil), do: {:good_guess, h}
 
     defp game_check(:already_used, _, tl, _),   do: {:already_used, tl}
 
