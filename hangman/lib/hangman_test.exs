@@ -1,6 +1,30 @@
 defmodule HangmanTest do
   use ExUnit.Case
 
+  describe "Test new_game initializes state" do
+    test "struct contains non empty word" do
+      game = Hangman.new_game()
+      assert String.length(game.word) > 0
+    end
+
+    test "struct contains non empty letters" do
+      game = Hangman.new_game()
+      assert length(game.letters) > 0
+    end
+
+    test "struct contains empty used letters" do
+      game = Hangman.new_game()
+      assert length(game.used) == 0
+    end
+
+    test "struct game_state is :initializing" do
+      game = Hangman.new_game()
+      assert game.game_state == :initializing
+    end
+
+  end
+
+
   describe "Test state updates" do
     test ":lost on 0 turns_left" do
       game = %Hangman.Game{ turns_left: 0, game_state: :lost,
