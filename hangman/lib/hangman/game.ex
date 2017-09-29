@@ -66,7 +66,8 @@ defmodule Hangman.Game do
   end
   # Last turn and letter not in word
   def make_move(state=%{ turns_left: 1 }, _, false, _) do
-    %{ state | game_state: :lost, turns_left: 0}
+    %{ state | game_state: :lost, turns_left: 0,
+               letters: String.codepoints(state.word)}
   end
   # Letter not in word
   def make_move(state, letter, false, _) do
