@@ -34,7 +34,9 @@ defmodule Hangman.Game do
   def make_move(state, letter) do
     letter_in_word = letter in String.codepoints(state.word)
     letter_in_used = letter in state.used
-    state =  make_move(state, letter, letter_in_word, letter_in_used)
+    valid_guess = String.match?(letter, ~r/^[a-z]$/)
+    state =  make_move(state, letter, letter_in_word,
+                       letter_in_used, valid_guess)
     { state, tally(state) }
   end
 

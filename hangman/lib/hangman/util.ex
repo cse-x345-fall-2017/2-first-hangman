@@ -70,27 +70,31 @@ defmodule Hangman.Util do
   @doc """
   Update the state of the game, given the letter guessed
   """
+  # Invalid letter
+  def make_move(_, _, _, _, false) do
+    raise ArgumentError, message: "invalid letter"
+  end
   # No turns left
-  def make_move(state=%{ turns_left: 0 }, _, _, _) do
+  def make_move(state=%{ turns_left: 0 }, _, _, _, _) do
     %{ state | game_state: :lost }
   end
   # Letter already used
-  def make_move(state, _, _, true) do
+  def make_move(state, _, _, true, _) do
     %{ state | game_state: :already_used }
   end
   # Last turn and letter not in word
-  def make_move(state=%{ turns_left: 1 }, _, false, _) do
+  def make_move(state=%{ turns_left: 1 }, _, false, _, _) do
     %{ state | game_state: :lost, turns_left: 0,
                letters: String.codepoints(state.word)}
   end
   # Letter not in word
-  def make_move(state, letter, false, _) do
+  def make_move(state, letter, false, _, _) do
     %{ state | game_state: :bad_guess }
     |> Map.update!(:turns_left, &decrement/1)
     |> update_state(letter)
   end
   # Letter in word
-  def make_move(state, letter, true, _) do
+  def make_move(state, letter, true, _, _) do
     %{ state | game_state: :good_guess }
     |> update_state(letter)
   end
