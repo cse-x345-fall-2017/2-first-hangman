@@ -12,6 +12,13 @@ defmodule Hangman.Util do
   end
 
   @doc """
+  Return true if game won (all letters guessed)
+  """
+  def won?(state) do
+    Enum.all?(state.letters, &(&1 != "_"))
+  end
+
+  @doc """
   Update the state of the game to :won if won is true
   """
   def update_if_won(state, true) do
@@ -55,7 +62,7 @@ defmodule Hangman.Util do
     |> Map.put(:last_guess, letter)
     |> update_letters
 
-    won = Enum.all?(state.letters, &(&1 != "_"))
+    won = won?(state)
     state |> update_if_won(won)
   end
 
@@ -84,7 +91,7 @@ defmodule Hangman.Util do
   end
   # Letter in word
   def make_move(state, letter, true, _) do
-    state = %{ state | game_state: :good_guess }
+    %{ state | game_state: :good_guess }
     |> update_state(letter)
   end
 
