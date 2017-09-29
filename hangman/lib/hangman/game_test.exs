@@ -39,5 +39,23 @@ defmodule GameTest do
       assert tally.game_state == :bad_guess
     end
 
+    test ":good_guess on letter in word" do
+      game = %Hangman.Game{ turns_left: 4, game_state: :bad_guess,
+        word: "dog", used: ["b"], last_guess: "b",
+        letters: ["_", "_", "_"] }
+
+      { _, tally } = Hangman.make_move(game, "d")
+      assert tally.game_state == :good_guess
+    end
+
+    test ":won on guessed last letter in word" do
+      game = %Hangman.Game{ turns_left: 4, game_state: :good_guess,
+        word: "dog", used: ["d", "o"], last_guess: "o",
+        letters: ["d", "o", "_"] }
+
+      { _, tally } = Hangman.make_move(game, "g")
+      assert tally.game_state == :won
+    end
+
   end
 end
