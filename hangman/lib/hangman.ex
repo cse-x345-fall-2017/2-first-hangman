@@ -1,6 +1,6 @@
 defmodule Hangman do
   @moduledoc """
-  Documentation for Hangman.
+  This is the API for Hangman
   """
 
   defdelegate new_game,               to: Hangman.Game

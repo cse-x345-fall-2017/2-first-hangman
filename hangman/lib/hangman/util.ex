@@ -1,9 +1,19 @@
 defmodule Hangman.Util do
+  @moduledoc """
+  This module includes utility functions for updating
+  the game's state
+  """
 
+  @doc """
+  Decrement x by 1
+  """
   def decrement(x) do
     x - 1
   end
 
+  @doc """
+  Update the state of the game to :won if won is true
+  """
   def update_if_won(state, true) do
     %{ state | game_state: :won }
   end
@@ -11,6 +21,11 @@ defmodule Hangman.Util do
     state
   end
 
+  @doc """
+  Return the letter if true, else display an underscore.
+
+  Used in representing the current word, with guesses filled in.
+  """
   def letter_display(letter, true) do
     letter
   end
@@ -18,6 +33,10 @@ defmodule Hangman.Util do
     "_"
   end
 
+  @doc """
+  Update :letters in the state, by filling in any correctly
+  guessed letters
+  """
   def update_letters(state) do
     letters = state.word
     |> String.codepoints
@@ -25,6 +44,11 @@ defmodule Hangman.Util do
     Map.put(state, :letters, letters)
   end
 
+  @doc """
+  Update the state of a game including the letters used,
+  the last guess, and the :letters representation of the
+  word, and the game state if won
+  """
   def update_state(state, letter) do
     state = state
     |> Map.put(:used, [ letter | state.used])
@@ -36,6 +60,9 @@ defmodule Hangman.Util do
   end
 
 
+  @doc """
+  Update the state of the game, given the letter guessed
+  """
   # No turns left
   def make_move(state=%{ turns_left: 0 }, _, _, _) do
     %{ state | game_state: :lost }
