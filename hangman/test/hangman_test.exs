@@ -3,7 +3,15 @@ defmodule HangmanTest do
   doctest Hangman
 
   test "creates new game" do
-    %{status: status} Hangman.new_game()
-    assert status == :initializing
+    %{game_state: game_state} = Hangman.new_game()
+    assert game_state == :initializing
+  end
+
+  test "check bad guess" do
+    letters = String.codepoints("TestWord")
+    guess = "z"
+    game = %Hangman.Game{letters: letters, last_guess: guess}
+    %Hangman.Game{game_state: game_state} = Hangman.Impl.check_guess(game)
+    assert game_state == :bad_guess
   end
 end
