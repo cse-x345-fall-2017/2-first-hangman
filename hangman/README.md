@@ -1,6 +1,7 @@
 # Hangman
 
-**TODO: Add description**
+##Simple module for playing game of hangman
+Defines a simple api for playing Hangman
 
 ## Installation
 
