@@ -75,14 +75,14 @@ defmodule Hangman.Impl do
   end
 
   def check_game_over(game = %Hangman.Game{game_state: :good_guess, used: used, letters: letters}) do
-        diff_len = letters
-                   |> MapSet.new
-                   |> MapSet.difference(MapSet.new(used))
-                   |> MapSet.size
-        case diff_len do
-          0 -> %Hangman.Game{game | game_state: :won}
-          _ -> game
-        end
+    diff_len = letters
+                |> MapSet.new
+                |> MapSet.difference(MapSet.new(used))
+                |> MapSet.size
+    case diff_len do
+      0 -> %Hangman.Game{game | game_state: :won}
+      _ -> game
+    end
   end
 
   def check_game_over(game = %Hangman.Game{}) do

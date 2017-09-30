@@ -50,5 +50,31 @@ defmodule HangmanTest do
     assert Enum.join(used) == "bceq"
   end
 
-  #check game over
+  @game %Hangman.Game{letters: String.codepoints("testword"), game_state: :bad_guess, turns_left: 7}
+  test "update turns left subtracts 1 from turns on bad guess" do
+    turns_left_before = @game.turns_left
+    %Hangman.Game{turns_left: turns_left} = Hangman.Impl.update_turns_left(@game)
+
+    assert turns_left == turns_left_before - 1
+  end
+
+  @game %Hangman.Game{letters: String.codepoints("testword"), game_state: :good_guess, turns_left: 7}
+  test "update turns left does not modify turns on good guess" do
+    turns_left_before = @game.turns_left
+    %Hangman.Game{turns_left: turns_left} = Hangman.Impl.update_turns_left(@game)
+
+    assert turns_left == turns_left_before
+  end
+
+  @game %Hangman.Game{letters: String.codepoints("testword"), game_state: :good_guess, used: List.flatten([String.codepoints("testword") | ["z", "q", "r"]])}
+  test "check_game_over ends with win when all letters guessed on good guess" do
+    %Hangman.Game{game_state: game_state} = Hangman.Impl.check_game_over(@game)
+    assert game_state == :won
+  end
+
+  @game %Hangman.Game{letters: String.codepoints("testword"), game_state: :bad_guess, used: List.flatten([String.codepoints("test") | ["z", "q", "r"]]), turns_left: 0}
+  test "check_game_over ends with loss out of turns on bad guess" do
+    %Hangman.Game{game_state: game_state} = Hangman.Impl.check_game_over(@game)
+    assert game_state == :lost
+  end
 end
