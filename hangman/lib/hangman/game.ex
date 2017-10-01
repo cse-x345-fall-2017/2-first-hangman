@@ -27,9 +27,6 @@ defmodule Hangman.Game do
     def tally(game) do 
         %{game_state: status, turns_left: left, letters: l,
             used: u, last_guess: g} = game
-
-        %{game_state: status, turns_left: left, letters: l,
-            used: u, last_guess: g}
     end
 
 #####################################################################
@@ -100,7 +97,7 @@ defmodule Hangman.Game do
         insert_guess(w, l, guess, Enum.find_index(w, fn(x) -> x == guess end), u)
     end
 
-    #Changes state of game based on the guess check
+    #Changes state of game based on the guess result
 
     defp game_check(:already_used, _, l, _, tl, _),   do: {:already_used, tl, l}
 
