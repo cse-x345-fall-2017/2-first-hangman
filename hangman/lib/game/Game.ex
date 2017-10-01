@@ -57,8 +57,8 @@ defmodule Hangman.Game do
   """
   def update_record(word,%Hangman.Game.Game_record{}=record,letter) do
     cond do 
-      count(record.letters)==0 -> IO.puts "move is invalid after won"; record
-      record.turns_left==0 -> IO.puts "move is invalid after lost"; record
+      record.game_state == :won -> IO.puts "move is invalid after won"; record
+      record.game_state == :lost -> IO.puts "move is invalid after lost"; record
       true ->
       letters = record.letters
       already_used = letter in record.used
@@ -121,7 +121,7 @@ defmodule Hangman.Game do
       String.codepoints|>
       Enum.filter(&(&1!="\r"))|> #avoid "\r"
       deal_empty   #if word is empty ,return "cat"
-    IO.inspect word 
+    #IO.inspect word 
     initword = word |> Enum.reduce([],fn(_,acc)->["_"|acc] end)
     spawn(Hangman.Game,:play,[word,%Game_record{letters: initword}])
   end
