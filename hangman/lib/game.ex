@@ -9,7 +9,8 @@ end
 
 defmodule Hangman.Game do
   @moduledoc """
-  Documentation for Hangman.
+  The Hangman.Game module provides an api to allow users to create a game of
+  hangman, make guesses, and see the progression off the game.
   """
 
   def new_game() do
@@ -32,7 +33,7 @@ defmodule Hangman.Game do
      Enum.map(&(x_or_underscore(&1, &1 in used)))
   end
 
-  defp decrement_terms(game), do: Map.update!(game, :turns_left, &(&1 - 1))
+  defp decrement_turns(game), do: Map.update!(game, :turns_left, &(&1 - 1))
 
   # Case where the letter is already used
   defp make_guess(game, _, true, _), do: %{game | game_state: :already_used}
@@ -42,7 +43,7 @@ defmodule Hangman.Game do
   end
   # Generic bad guess with no special conditions
   defp make_guess(game = %{used: used}, guess, false, false) do
-    %{decrement_terms(game) | used: used ++ [guess], game_state: :bad_guess}
+    %{decrement_turns(game) | used: used ++ [guess], game_state: :bad_guess}
   end
   # Generic good guess
   defp make_guess(game = %{used: used, word: word}, guess, false, true) do
