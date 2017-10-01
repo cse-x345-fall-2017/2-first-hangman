@@ -10,7 +10,7 @@ defmodule Hangman.Game do
 
   def new_game() do
     %Hangman.Game{
-      letters: ["K","E","L","L","E","N"]
+      letters: Dictionary.random_word |> String.upcase |> String.graphemes
     }
   end
     
