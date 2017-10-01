@@ -16,7 +16,5 @@ defmodule Hangman do
     :world
   end
 
-  def struct do
-    %GameState{}
-  end
+  defdelegate new_game(), to: Hangman.Game
 end
