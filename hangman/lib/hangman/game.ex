@@ -2,21 +2,18 @@ defmodule Hangman.Game do
 
   # game state structure
   defmodule GameState do
-  
     defstruct(
-      game_state:  :initializing, 
+      game_state:  :initializing,
       last_guess:  "",             # last guess by the player
       turns_left:  7,              # number of turns left
       answers:     [],             # answers to all letters
       letters:     [],             # correctly guess letters
       used:        []              # all letteres used for guesses
    )
-   
   end
   
   
   # === PUBLIC FUNCTIONS ===================================================== #
-  
   
   # create a new game
   def new_game do
@@ -47,7 +44,6 @@ defmodule Hangman.Game do
   
   # === TEST FUNCTIONS ======================================================= #
   
-  
   # testing function for initializing a new game with a specified word
   def new_game_test(word) do
     init_game_state(word)
@@ -55,7 +51,6 @@ defmodule Hangman.Game do
   
   
   # === PRIVATE FUNCTIONS ==================================================== #
-  
   
   defp init_game_state(word) do
     %GameState{
@@ -119,7 +114,7 @@ defmodule Hangman.Game do
   
   
   # reveal letters that match the guess
-  def reveal_letters(game, guess) do
+  defp reveal_letters(game, guess) do
     %{ game | letters: letter_match(game.answers, game.letters, guess) }
   end
   
