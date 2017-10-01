@@ -6,12 +6,21 @@ defmodule Hangman.Game do
                                          # position has been guessed, that letter will appear in `letters`. 
                                          # Otherwise, it will be shown as an underscore
             used: [],                    # A sorted list of the letters already guessed
-            last_guess: ""               # the last letter guessed by the player
+            last_guess: "",               # the last letter guessed by the player
+            word: ""                     # the secret word attempting to be guessed
 
   def new_game() do
+    word = Dictionary.random_word
     %Hangman.Game{
-      letters: Dictionary.random_word |> String.upcase |> String.graphemes
+      word: word,
+      letters: List.duplicate("_", String.length(word))
     }
+  end
+
+  def tally(game) do
+    game
+    |> Map.from_struct
+    |> Map.delete(:word)
   end
     
 end
