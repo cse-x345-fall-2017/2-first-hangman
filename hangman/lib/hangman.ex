@@ -3,10 +3,7 @@ defmodule Hangman do
   API for Hangman.
   """
 
-  defdelegate new_game,               to:Hangman.Impl
-  defdelegate tally(game),            to:Hangman.Impl
-  defdelegate make_move(game, guess), to:Hangman.Impl
-
-
-  end
+  defdelegate new_game(),             to: Hangman.Impl
+  defdelegate tally(game),            to: Hangman.Impl
+  defdelegate make_move(game, guess), to: Hangman.Impl
 end
