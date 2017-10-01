@@ -34,24 +34,16 @@ defmodule Hangman.Game do
 
         %{word: w, letters: l, used: u, turns_left: tl} = game
 
-        {game_state, new_l, u} = 
+        {game_state, tl, l, u} = 
         guess_attempt(
             Enum.any?(w,fn(x) -> x == guess end),
             Enum.any?(u,fn(x) -> x == guess end),
             w,
             l,
+            tl,
+            tl == 1,
             u,
             guess
-        ) 
-
-        {game_state, tl, new_l} = 
-        game_check(
-            game_state,
-            w,
-            new_l,
-            tl <= 1,
-            tl,
-            w == new_l
         ) 
 
         {
@@ -59,14 +51,14 @@ defmodule Hangman.Game do
                 game_state: game_state,
                 turns_left: tl,
                 word: w,
-                letters: new_l,
+                letters: l,
                 used: u,
                 last_guess: guess
             },
             %{
                 game_state: game_state,
                 turns_left: tl,
-                letters: new_l,
+                letters: l,
                 used: u,
                 last_guess: guess
             }
@@ -74,35 +66,31 @@ defmodule Hangman.Game do
     end
 
     defp guess_ok?(false), do: raise "Please enter an English alphabet character"
-    defp guess_ok?(_), do: :ok
+    defp guess_ok?(_),     do: :ok
 
-    defp guess_attempt(_, true, _, l, u, _),         do: {:already_used, l, u}
-    defp guess_attempt(false, _, _, l, u, guess),    do: {:bad_guess, l, format_used(u,guess)}
-    defp guess_attempt(true, false, w, l, u, guess), do: insert_guess(w, l, guess, true, u)
+    defp guess_attempt(_, true, _, l, tl, _, u, _),          do: {:already_used, tl, l, u}
+
+    defp guess_attempt(false, _, _, l, tl, false, u, guess), do: {:bad_guess, tl-1, l, format_used(u,guess)}
+    defp guess_attempt(false, _, w, _, tl, true, u, guess),  do: {:lost, tl-1, w, format_used(u,guess)}
+
+    defp guess_attempt(true, false, w, l, tl, _, u, guess),  do: insert_guess(w, w, l, tl, guess, true, u)
+
+    defp win_check(true, w, _, tl, u),                       do: {:won, tl, w, u}
+    defp win_check(false, _, l, tl, u),                      do: {:good_guess, tl, l, u}
 
     #:good_guess passed, function below will always insert into
-    #letters field at least once
+    #letters field at least once then check for response
 
-    defp insert_guess(_, l, guess, nil, u),          do: {:good_guess, l, format_used(u,guess)}
-    defp insert_guess(w, l, guess, _, u) do 
+    defp insert_guess(_,w, l, tl, guess, nil, u),   do: win_check(w == l, w, l, tl, format_used(u,guess))
+    defp insert_guess(w_ref, w, l, tl, guess, _, u) do 
     
-        index = Enum.find_index(w, fn(x) -> x == guess end)
+        index = Enum.find_index(w_ref, fn(x) -> x == guess end)
 
         l = List.replace_at(l, index, guess)
-        w = List.replace_at(w,index, "!")
+        w_ref = List.replace_at(w_ref,index, "!")
 
-        insert_guess(w, l, guess, Enum.find_index(w, fn(x) -> x == guess end), u)
+        insert_guess(w_ref, w, l, tl, guess, Enum.find_index(w_ref, fn(x) -> x == guess end), u)
     end
-
-    #Changes state of game based on the guess result
-
-    defp game_check(:already_used, _, l, _, tl, _),   do: {:already_used, tl, l}
-
-    defp game_check(:bad_guess, _, l, false, tl, _),  do: {:bad_guess, tl-1, l}
-    defp game_check(:bad_guess, w, _, true, tl, _),   do: {:lost, tl-1, w}
-
-    defp game_check(:good_guess, _, l, _, tl, false), do: {:good_guess, tl, l}
-    defp game_check(:good_guess, w, _, _, tl, true),  do: {:won, tl, w}
     
 
     defp format_used(used, guess) do
