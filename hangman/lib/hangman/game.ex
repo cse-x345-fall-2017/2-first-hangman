@@ -30,7 +30,8 @@ defmodule Hangman.Game do
     letter_in_word = word |> String.contains?(guess)
     letter_is_used = guess in used
     letters_unguessed = "_" in letters
-    do_guess(game, letter_in_word, letter_is_used, letters_unguessed)
+    valid_letter = String.match?(guess, ~r/^[a-z]$/)
+    do_guess(game, letter_in_word, letter_is_used, letters_unguessed, valid_letter)
   end
 
   defp get_letter_representation(letter, true) do
@@ -41,8 +42,12 @@ defmodule Hangman.Game do
     "_"
   end
 
+  defp do_guess(_, _, _, _, false) do
+    raise ArgumentError, message: "Invalid letter, must be a-z"
+  end
+
   # Letter already used
-  defp do_guess(state, _, true, _) do
+  defp do_guess(state, _, true, _, _) do
     game = state 
     |> Map.put(:game_state, :already_used)
 
@@ -50,7 +55,7 @@ defmodule Hangman.Game do
   end
 
   # Letter is in word and not used, game not over
-  defp do_guess(state = %{used: used, last_guess: last_guess}, true, false, true) do
+  defp do_guess(state = %{used: used, last_guess: last_guess}, true, false, true, _) do
     game = state 
     |> Map.put(:game_state, :good_guess)
     |> Map.put(:used, used ++ [last_guess])
@@ -59,15 +64,16 @@ defmodule Hangman.Game do
     { game, tally(game) }
   end
 
-  defp do_guess(state = %{turns_left: 1}, false, _, _) do
+  defp do_guess(state = %{turns_left: 1}, false, _, _, _) do
     game = state 
     |> Map.put(:game_state, :lost)
+    |> Map.put(:turns_left, 0)
 
     { game, tally(game) }
   end
 
   # Letter is not in word
-  defp do_guess(state = %{used: used, turns_left: turns_left, last_guess: last_guess}, false, _, _) do
+  defp do_guess(state = %{used: used, turns_left: turns_left, last_guess: last_guess}, false, _, _, _) do
     game = state 
     |> Map.put(:game_state, :bad_guess)
     |> Map.put(:turns_left, turns_left-1)
@@ -77,7 +83,7 @@ defmodule Hangman.Game do
   end
 
   # Game over, all letters in word guessed
-  defp do_guess(state, _, _, false) do
+  defp do_guess(state, _, _, false, _) do
     game = state 
     |> Map.put(:game_state, :won)
 
