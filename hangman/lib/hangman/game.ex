@@ -24,10 +24,7 @@ defmodule Hangman.Game do
 
 #####################################################################
 
-    def tally(game) do 
-        %{game_state: status, turns_left: left, letters: l,
-            used: u, last_guess: g} = game
-    end
+    def tally(game), do: Map.delete(game,:word)
 
 #####################################################################
 
