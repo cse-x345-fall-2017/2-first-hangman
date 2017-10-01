@@ -26,6 +26,12 @@ defmodule HangmanTest do
     assert game_state == :already_guessed
   end
 
+  @game %Hangman.Game{@game| used: ["e"]}
+  test "make move returns error when longer than one letter" do 
+    {:error, msg }= Hangman.make_move(@game, "en")
+    assert msg == "guess should be one letter"
+  end
+
   @game %Hangman.Game{@game| used: ["a", "e", "i", "o", "u"]}
   test "get_tally_letters correctly hides not guessed letters" do
     letters = Hangman.Impl.get_tally_letters(@game)

@@ -13,7 +13,7 @@ defmodule Hangman.Impl do
     }
   end
 
-  def make_move(game = %Hangman.Game{}, guess) do
+  def make_move(game = %Hangman.Game{}, guess) when byte_size(guess) == 1 do
     updated_game = %Hangman.Game{game | last_guess: guess} |>
                    check_guess() |>
                    update_used_letters() |>
@@ -23,6 +23,10 @@ defmodule Hangman.Impl do
     
     #game = %Hangman.Game{game | last_guessed: guess, turns_left: game.turns_left - 1}
     {updated_game, tally(updated_game)}
+  end
+
+  def make_move(_game, _guess) do
+    {:error, "guess should be one letter"}
   end
 
   def get_tally_letters(%Hangman.Game{game_state: :lost, letters: letters}) do
