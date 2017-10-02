@@ -1,0 +1,7 @@
+defmodule Hangman.Move do
+  def make_move(game = %Hangman.Init{}, guess) do
+    is_in(guess in game.word, game, guess)
+  end
+  def is_in(True, game, guess) do
+    game = %Hangman.Init
+end
