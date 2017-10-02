@@ -29,6 +29,11 @@ defmodule Game do
     Map.update(game, :turns_left, &(&1 -1))
   end
 
+  #Game Status Check
+  defp win_or_lose(game, false) do
+    %{game | game_state: :won}
+  end
+
   #Mapping of the word to letters
   defp set_letters(word) do
     List.duplicate("_", String.length(word))
@@ -53,13 +58,6 @@ defmodule Game do
   defp guess(game = %{used: used}, guess, false, false) do
     %{turn_taken(game) | used: used ++ [guess], game_state: :bad_guess}
   end
-
-  #Game Status Check
-  defp win_or_lose(game, false) do
-    %{game | game_state: :won}
-  end
-
-
 
   def make_move(game = %{used: used, word: word}, guess) do
     game = %{game | last_guess: guess}
