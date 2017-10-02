@@ -31,9 +31,11 @@ defmodule Hangman.Game do
     mask = word_mask(game.word,game.used)
     game_won = won(mask,game.word)
     state = won_atom(state,game_won)
-    %Hangman.Game{game | used: used, turns: turns,
+    next_game = %Hangman.Game{game | used: used, turns: turns,
     last_guess: guess,
     game_state: state}
+    tally = tally(next_game)
+    {game, tally}
   end
 
   def set_check(set,letter) do
