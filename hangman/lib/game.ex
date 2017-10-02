@@ -38,8 +38,9 @@ defmodule Hangman.Game do
   # Case where the letter is already used
   defp make_guess(game, _, true, _), do: %{game | game_state: :already_used}
   # Case where the user lost
-  defp make_guess(game = %{turns_left: 1, used: used}, guess, false, false) do
-    %{game | turns_left: 0, used: used ++ [guess], game_state: :lost}
+  defp make_guess(game = %{turns_left: 1, used: used, word: word}, guess, false, false) do
+    %{game | turns_left: 0, used: used ++ [guess], game_state: :lost} |>
+    Map.put(:letters, String.graphemes(word))
   end
   # Generic bad guess with no special conditions
   defp make_guess(game = %{used: used}, guess, false, false) do
