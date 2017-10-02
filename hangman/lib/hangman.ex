@@ -1,6 +1,7 @@
 defmodule Hangman do
   @moduledoc """
-  Documentation for Hangman.
+  The Hangman module provides a set of exposed functions that are then delegated
+  to Hangman.Game
   """
 
   defdelegate new_game(), to: Hangman.Game
