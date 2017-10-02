@@ -15,23 +15,11 @@ defmodule Hangman.Game do
 
   end
 
-  def new_game() do
-    init_game()
-  end
-
-  def new_game(word) do
-    word
-    |> init_game()
-  end
-
-  def tally(game) do
-    game
-    |> get_tally()
-  end
-
-  def make_move(game, guess) do
-    make_move_handler(game, guess)
-  end
+  def new_game(),             do: init_game()
+  #Only for testing
+  def new_game(word),         do: word |> init_game()
+  def tally(game),            do: game |> get_tally()
+  def make_move(game, guess), do: make_move_handler(game, guess)
 
   ###########################
   # End of public Functions #
@@ -62,131 +50,89 @@ defmodule Hangman.Game do
   ###############################
 
   # Return a map based on the game state and current status of the game
-  def get_tally(%State{
-                    game_state: state,
-                    turns_left: turns_left,
-                    last_guess: last_guess,
-                    used:       used,
-                    letters:    letters
-                  }) do
-    %{
-      game_state: state,
-      turns_left: turns_left,
-      used:       used,
-      last_guess: last_guess,
-      letters:    letters
-    }
-  end
-
-  # Convert the word to list of letters
-  defp to_list(word) do
-    word
-    |> String.codepoints()
-    |> Enum.to_list()
+  def get_tally(game) do
+    Map.delete(game, :word)
+    |> Map.delete(:left_letters_set)
+    |> Map.delete(:__struct__)
   end
 
   # If lost then return then set the letters as list of word
   defp replace_letters(%State{ game_state: :lost } = game, _) do
     game.word
-    |> to_list
+    |> String.codepoints
   end
 
-  # Set all the letters in the word by an _. Used when game is initialized i.e., when used is empty.
-  defp replace_letters(word, []) do
-    word
-    |> String.replace(~r/\w/, "_")
-    |> to_list
-  end
+  # Set all the letters in the word by an _. Used when game is initialized 
+  # i.e., when used is empty.
+  defp replace_letters(word, []),  do: List.duplicate("_", String.length(word))
 
   # Set the letters that have not yet been guessed by an _ in appropriate positions
   defp replace_letters(word, used) do
-    word
-    |> String.replace(~r/[^#{used}]/, "_")
-    |> to_list
+    String.replace(word, ~r/[^#{used}]/, "_") 
+    |> String.codepoints
   end
 
   ###################################
   # Private Functions for make_move #
   ###################################
 
-  defp is_letter?(letter) do
-    letter
-    |> String.match?(~r/^[A-Za-z]$/)
-  end
+  defp is_letter?(letter), do: letter |> String.match?(~r/^[A-Za-z]$/)
 
   # check if guess is in used and handle the guess accordingly
   defp make_move_handler(%State{ used: used } = game, guess) do
-    game = handle_guess(game, guess |> is_letter?(), guess in used, guess)
+    game = update_state(game, guess |> is_letter?(), guess in used, guess)
     { game, game |> tally() }
   end
 
   # For fun
-  defp handle_guess(%State{ game_state: :lost } = game , _, _, _) do
-    IO.puts("Game Over! Please start a new game!")
-    game
-  end
+  defp update_state(%State{ game_state: :lost } = game , _, _, _), do: game
 
-  defp handle_guess(game, false, _, _) do
-    IO.puts("Invalid letter entered. Please try again!")
-    game
-  end
+  # If invalid letter entered
+  defp update_state(game, false, _, _),                            do: game
 
   # If guess is in used, then set state to :already_used
-  defp handle_guess(game, true, true, _guess) do
-    %State{ game | game_state: :already_used }
-  end
+  defp update_state(game, true, true, _guess), do: %State{ game | game_state: :already_used }
 
   # If guess is not in used, then check if guess is in the set of letters left
   # and handle accordingly
-  defp handle_guess(game, true, false, guess) do
+  defp update_state(game, true, false, guess)  do
     used = concat_and_sort(game.used, guess)
-    game =  %State{ game |  last_guess: guess,
-                            used:       used,
-                            letters:    replace_letters(game.word, used) }
-    handle_map(game, guess in game.left_letters_set, guess)
+    game = %State{ game | last_guess: guess,
+                          used:       used,
+                          letters:    replace_letters(game.word, used) }
+    handle_state(game, guess in game.left_letters_set, guess)
   end
 
   # If guess is in set of letters left then update used and set of left letters 
   # Also has to checked if the game is won and set game_state accordingly
-  defp handle_map(game, true, guess) do
+  defp handle_state(game, true, guess) do
     game =  %State{ game | left_letters_set: MapSet.delete(game.left_letters_set, guess) }
-    handle_state( game, game.left_letters_set |> MapSet.size())
+    won?(game, game.left_letters_set |> MapSet.size())
   end
 
   # If guess is not in set of letters left then update turns left and used and
   # check if the state is :bad_guess or :lost
-  defp handle_map(game, false, _guess) do
+  defp handle_state(game, false, _guess) do
     game = %State{ game | turns_left: game.turns_left - 1 }
-    handle_turns(game, game.turns_left)
+    lost?(game, game.turns_left)
   end
 
   # Helper function to add and sort the list of used letters
-  defp concat_and_sort(used, guess) do
-    used ++ [guess]
-    |> Enum.sort()
-  end
+  defp concat_and_sort(used, guess), do: used ++ [guess] |> Enum.sort()
 
   # If number of turns is zero, then set the game_state to :lost and update letters
-  defp handle_turns(game, 0) do
-    %State{ game |  game_state: :lost,
-                    letters:    game.word |> String.codepoints() }
-  end
+  defp lost?(game, 0), do: %State{ game | game_state: :lost,
+                                          letters:    String.codepoints(game.word) }
 
   # If number of turns is greater than 0, then set the game_state to :bad_guess
-  defp handle_turns(game, turns) when turns > 0 do
-    %State{ game | game_state: :bad_guess }
-  end
+  defp lost?(game, turns) when turns > 0, do: %State{ game | game_state: :bad_guess }
 
   # Check if the set of letters left is none and set the game_state to :won
-  defp handle_state(game, 0) do
-    %State{ game | game_state: :won }
-  end
+  defp won?(game, 0), do: %State{ game | game_state: :won }
 
   # Check if there are any more in the set of letters left and 
   # set the game_state to :good_guess
-  defp handle_state(game, _) do
-    %State{ game | game_state: :good_guess }
-  end
+  defp won?(game, _), do: %State{ game | game_state: :good_guess }
 
 end
 
