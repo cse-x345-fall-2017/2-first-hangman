@@ -1,0 +1,16 @@
+defmodule Hangman.Init do
+  defstruct(
+    game_state: :initializing,
+    turns_left: 7,
+    word:       [],
+    letters:    [],
+    used:       [],
+    last_guess: ""
+  )
+  def new_game() do
+    new_letters = Dictionary.random_word()
+    |> String.trim()
+    |> String.codepoints()
+    %Hangman.Init{word: new_letters, letters: List.duplicate("_", length(new_letters))}
+  end
+end
