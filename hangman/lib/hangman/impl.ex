@@ -52,7 +52,7 @@ defmodule Hangman.Impl do
 
   # If guess has already been used
   def determine_game_state(game, _, true, true) do
-    %Tally{ game | game_state: :used }
+    %Tally{ game | game_state: :already_used }
   end
 
   # If both valid guess and not already used, update state
@@ -86,20 +86,6 @@ defmodule Hangman.Impl do
   def determine_win(game, false), do: %Tally{ game | game_state: :won }
   def determine_win(game, true), do: game
 
-  def get_state(true), do: :good_guess
-  def get_state(false), do: :bad_guess
-  def get_state(word, guess) do
-    String.contains?(word, guess)
-    |> get_state
-  end
-
-  def valid_guess(guess) do
-    guess
-    |> String.match?(~r/^[A-Za-z]$/)
-  end
-
   def turn(game), do: %Tally{ game | turns_left: game.turns_left - 1}
-
-
 
 end
