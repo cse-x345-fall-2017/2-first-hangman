@@ -33,7 +33,12 @@ defmodule HangmanTest do
   end
 
   test "make move returns game and tally" do
+    # Using test word "elba"
     game = Hangman.new_game()
+    game = %State{game |
+    word: ["e", "l", "b", "a"],
+    letters: ["_", "_", "_", "_"]
+    }
 
     assert { game, tally } = Hangman.make_move(game, "e")
     assert %State{} = game
@@ -49,6 +54,11 @@ defmodule HangmanTest do
   test "game status changes correctly on making move" do
     # Using test word "elba"
     game = Hangman.new_game()
+    game = %State{game |
+    word: ["e", "l", "b", "a"],
+    letters: ["_", "_", "_", "_"]
+    }
+
     # Good guess
     { game, tally } = Hangman.make_move(game, "e")
     assert tally.game_state == :good_guess
@@ -60,6 +70,8 @@ defmodule HangmanTest do
   test "number of turns left changes correctly on making move" do
     # Using test word "elba"
     game = Hangman.new_game()
+    game = %State{game | word: ["e", "l", "b", "a"]}
+
     turns_left = game.turns_left
     # Good guess
     { game, tally } = Hangman.make_move(game, "e")
@@ -72,6 +84,11 @@ defmodule HangmanTest do
   test "used alphabets recorded correctly on making move" do
     # Using test word "elba"
     game = Hangman.new_game()
+    game = %State{game |
+    word: ["e", "l", "b", "a"],
+    letters: ["_", "_", "_", "_"]
+    }
+
     # Good guess
     { game, tally } = Hangman.make_move(game, "e")
     assert tally.used == ["e"]
@@ -83,6 +100,11 @@ defmodule HangmanTest do
   test "letters guessed recorded correctly on making move" do
     # Using test word "elba"
     game = Hangman.new_game()
+    game = %State{game |
+    word: ["e", "l", "b", "a"],
+    letters: ["_", "_", "_", "_"]
+    }
+
     # Good guess
     { game, tally } = Hangman.make_move(game, "e")
     assert tally.letters == ["e", "_", "_", "_"]
@@ -94,6 +116,11 @@ defmodule HangmanTest do
   test "last guess is recorded correctly" do
     # Using test word "elba"
     game = Hangman.new_game()
+    game = %State{game |
+    word: ["e", "l", "b", "a"],
+    letters: ["_", "_", "_", "_"]
+    }
+
     # Good guess
     { game, _tally } = Hangman.make_move(game, "e")
     assert game.last_guess == "e"
@@ -111,6 +138,7 @@ defmodule HangmanTest do
     # Good guess
     { game, _tally } = Hangman.make_move(game, "e")
     assert game.game_state == :won
+    assert game.letters == ["el"]
   end
 
   test "lose condition" do

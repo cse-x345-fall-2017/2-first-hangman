@@ -1,7 +1,5 @@
 defmodule Hangman.Game do
-  def new_game(), do: new_game("elba")
-
-  def new_game(word) do 
+  def new_game() do 
     # function to filter alphabets
     alphabets_only = fn x -> if Regex.match?(~r{[a-zA-Z]}, x),
                                do: true,
@@ -9,10 +7,9 @@ defmodule Hangman.Game do
                             end
 
     # Get a random word from dictionary and store it as a list of characters
-    # word = Dictionary.random_word()
-      word = word
-              |> String.split("")
-              |> Enum.filter(alphabets_only)
+    word = Dictionary.random_word()
+            |> String.split("")
+            |> Enum.filter(alphabets_only)
 
     # Initialize the progress as blanks
     letters =  Enum.map(word, fn _letter  -> "_" end)
@@ -34,13 +31,34 @@ defmodule Hangman.Game do
   end
 
   def make_move(game, guess) do
+    if Enum.member?(game.used, guess) do
+      game = %State{ game |
+        game_state: :already_guessed
+      }
+      { game, tally(game) }
+    else
+      make_move(game, guess, :new_guess)
+    end
+  end
+  def make_move(game, guess, _new_guess) do
     used = Enum.concat(game.used, [guess])
     letters_after = check(game.word, guess, game.letters)
     
     letters_changed? = letters_after !=  game.letters
+    won? = letters_after == game.word
+
     
     { game_state, turns_left } = update_if(letters_changed?,
-                                           game.turns_left)
+                                           game.turns_left,
+                                           won?)
+
+    # Letters represents entire word if won or lost
+    letters_after = if [:won, :lost] |> Enum.member?(game_state)
+                    do
+                      [Enum.join(game.word, "")]
+                    else
+                      letters_after
+                    end
 
     updated_game = %State{ game | used: used,
                                   letters: letters_after,
@@ -51,8 +69,10 @@ defmodule Hangman.Game do
   end
 
   # Returns updated values of turns and game state
-  def update_if(true, turns_left), do: { :good_guess, turns_left }
-  def update_if(false, turns_left), do: { :bad_guess, turns_left-1 }
+  def update_if(_letters_changed?, turns_left, true), do: { :won, turns_left }
+  def update_if(true, turns_left, _won), do: { :good_guess, turns_left }
+  def update_if(false, 1, _won), do: { :lost, 0 }
+  def update_if(false, turns_left, _won), do: { :bad_guess, turns_left-1 }
 
   # Compares guess with word to update letters
   def check(word, guess, letters), do: check(word, guess, letters, 0)
