@@ -9,7 +9,7 @@ defmodule Hangman.Impl do
   def new_game() do
     Dictionary.random_word()
     |> String.trim("/r")
-    |> initState()                            #helper function
+    |> initState()
   end
 
   # returns the tally for the given game
@@ -51,12 +51,12 @@ defmodule Hangman.Impl do
 
   # execute if guess is in used
   defp handle_answer(%State{} = game, _guess, true, _ifgood) do
- %State{game | game_state: :already_used}
+    %State{game | game_state: :already_used}
   end
 
   # execute if guess is not good
   defp handle_answer(%State{} = game, guess, _ifused, false) do
-   %State{game | game_state: :bad_guess,
+    %State{game | game_state: :bad_guess,
                   turns_left: game.turns_left - 1,
                   used: (game.used ++ [guess])|>Enum.sort
     }
@@ -104,19 +104,19 @@ defmodule Hangman.Impl do
 
   # update letters with good guess
   defp update_letters(letters, list, guess) do
-    i = Enum.find_index(list, fn(x) -> x == guess end)
-    update_letters2(letters, list, guess, i)
+    Enum.find_index(list, fn(x) -> x == guess end)
+    |>update_letters2(letters, list, guess)
   end
   
-  defp update_letters2(letters, _list, _guess, nil) do   
+  defp update_letters2(nil, letters, _list, _guess) do   
     letters
   end
 
-  defp update_letters2(letters, list, guess, i) do
+  defp update_letters2(i, letters, list, guess) do
     list=List.replace_at(list,i,"5")
     letters=List.replace_at(letters, i, guess)
-    i = Enum.find_index(list, fn(x) -> x == guess end)
-    update_letters2(letters, list, guess, i)
+    Enum.find_index(list, fn(x) -> x == guess end)
+    |>update_letters2(letters, list, guess)
   end
 
 end
