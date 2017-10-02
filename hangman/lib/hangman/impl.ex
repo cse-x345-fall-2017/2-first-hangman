@@ -32,11 +32,13 @@ defmodule Hangman.Impl do
 
 
 
-  ##########################################
-  # private function for function new_game #
-  ##########################################
+
+  ######################################################################
+  # planed to put this as private function.                            #
+  # However,put it as public function so that we can use it in testing #
+  ######################################################################
   # game start, initintal the state
-  defp initState(inputWord) do
+  def initState(inputWord) do
     %State{
       word: inputWord,
       word_to_list: String.codepoints(inputWord),
