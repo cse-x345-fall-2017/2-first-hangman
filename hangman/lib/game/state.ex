@@ -3,6 +3,6 @@ defmodule State do
             turns_left: 7,
             letters: [],
             used: [],
-            last_guessed: "",
+            last_guess: "",
             word: []
 end
