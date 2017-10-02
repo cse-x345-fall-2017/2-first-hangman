@@ -20,10 +20,10 @@ defmodule Hangman.GameTest do
 
   test "bad guess and turns decreasing" do
     g = Hangman.Game.new_game()
-    left_letters_set = g.left_letters_set
+    left_letters = g.left_letters
     alphabet_set = MapSet.new("abcdefghijklmnopqrstuvwxyz"
                               |> String.codepoints())
-    rest_set = MapSet.difference(alphabet_set, left_letters_set)
+    rest_set = MapSet.difference(alphabet_set, left_letters)
     letter = Enum.fetch!(rest_set, 0)
     { %Hangman.Game.State{  game_state: :bad_guess,
       turns_left: 6 }, _t } = Hangman.Game.make_move(g, letter)
@@ -31,17 +31,17 @@ defmodule Hangman.GameTest do
 
   test "lost" do
     g = Hangman.Game.new_game()
-    left_letters_set = g.left_letters_set
+    left_letters = g.left_letters
     alphabet_set = MapSet.new("abcdefghijklmnopqrstuvwxyz"
                               |> String.codepoints())
-    rest_set = MapSet.difference(alphabet_set, left_letters_set)
+    rest_set = MapSet.difference(alphabet_set, left_letters)
     assert :lost == make_moves(g, rest_set, 0, 7)
   end
 
   test "won" do
     g = Hangman.Game.new_game()
-    left_letters_set = g.left_letters_set
-    assert :won == make_moves(g, left_letters_set, 0, MapSet.size(left_letters_set))
+    left_letters = g.left_letters
+    assert :won == make_moves(g, left_letters, 0, MapSet.size(left_letters))
   end
 
   test "check if letters are revealed after right guess and, check if used and last_guess are updated" do

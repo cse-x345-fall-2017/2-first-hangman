@@ -4,13 +4,13 @@ defmodule Hangman.Game do
 
     #Struct for the state of the game
     defstruct(
-      word:             "" ,
-      game_state:       :initializing,
-      turns_left:       7,
-      letters:          [],
-      used:             [],
-      last_guess:       "",
-      left_letters_set: MapSet.new()
+      word:         "" ,
+      game_state:   :initializing,
+      turns_left:   7,
+      letters:      [],
+      used:         [],
+      last_guess:   "",
+      left_letters: MapSet.new()
     )
 
   end
@@ -33,9 +33,9 @@ defmodule Hangman.Game do
   
   # Initilize the state of the game
   defp init_game(word \\ Dictionary.random_word()) do
-    %State{ word:             word,
-            left_letters_set: word |> get_letters_set(),
-            letters:          replace_letters(word, [])}
+    %State{ word:         word,
+            left_letters: word |> get_letters_set(),
+            letters:      replace_letters(word) }
   end
 
   # Converts the random word into the MapSet
@@ -52,16 +52,16 @@ defmodule Hangman.Game do
   # Return a map based on the game state and current status of the game
   def get_tally(game) do
     Map.delete(game, :word)
-    |> Map.delete(:left_letters_set)
+    |> Map.delete(:left_letters)
     |> Map.delete(:__struct__)
   end
 
   # Set all the letters in the word by an _. Used when game is initialized 
   # i.e., when used is empty.
-  defp replace_letters(word, []),  do: List.duplicate("_", String.length(word))
+  defp replace_letters(word),       do: List.duplicate("_", String.length(word))
 
   # Set the letters that have not yet been guessed by an _ in appropriate positions
-  defp replace_letters(word, left) do
+  defp replace_letters(word, left)  do
     String.replace(word, ~r/[#{left}]/, "_") 
     |> String.codepoints
   end
@@ -92,14 +92,14 @@ defmodule Hangman.Game do
   defp update_state(game, true, false, guess)  do
     game = %State{ game | last_guess: guess,
                           used:       concat_and_sort(game.used, guess) }
-    handle_state(game, guess in game.left_letters_set, guess)
+    handle_state(game, guess in game.left_letters, guess)
   end
 
   # If guess is in set of letters left then update used and set of left letters 
   # Also has to checked if the game is won and set game_state accordingly
   defp handle_state(game, true, guess) do
-    game =  %State{ game | left_letters_set: MapSet.delete(game.left_letters_set, guess) }
-    won?(game, game.left_letters_set |> MapSet.size())
+    game =  %State{ game | left_letters: MapSet.delete(game.left_letters, guess) }
+    won?(game, game.left_letters |> MapSet.size())
   end
 
   # If guess is not in set of letters left then update turns left and used and
@@ -121,13 +121,14 @@ defmodule Hangman.Game do
 
   # Check if the set of letters left is none and set the game_state to :won
   defp won?(game, 0), do: %State{ game | game_state: :won,
-                                         letters:    String.codepoints(game.word)}
+                                         letters:    String.codepoints(game.word) }
 
   # Check if there are any more in the set of letters left and 
   # set the game_state to :good_guess
-  defp won?(game, _), do: %State{ game |  game_state: :good_guess,
-                                          letters:    replace_letters(game.word, MapSet.to_list(game.left_letters_set)) }
-
+  defp won?(game, _), do: %State{ game | game_state: :good_guess,
+                                         letters:    replace_letters(game.word, 
+                                         MapSet.to_list(game.left_letters)) }
+                                          
 end
 
 #$$$$$$$$$$$$$#
