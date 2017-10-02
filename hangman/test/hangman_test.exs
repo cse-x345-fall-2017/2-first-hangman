@@ -20,4 +20,14 @@ defmodule HangmanTest do
     # Is the word non-empty?
     assert [ _head | _tail ] = state.word
   end
+
+  test "returns proper tally" do
+    game = Hangman.new_game()
+    assert %{
+      game_state: _,
+      turns_left: _,
+      used: _,
+      letters: _
+    } = Hangman.tally(game)
+  end
 end

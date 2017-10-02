@@ -23,5 +23,10 @@ defmodule Hangman.Game do
       word: word
     }
   end
-  
+
+  def tally(game) do
+    game
+      |> Map.from_struct()
+      |> Map.drop([:word, :last_guessed])
+  end
 end

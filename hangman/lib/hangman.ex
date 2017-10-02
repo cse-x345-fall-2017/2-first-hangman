@@ -17,4 +17,5 @@ defmodule Hangman do
   end
 
   defdelegate new_game(), to: Hangman.Game
+  defdelegate tally(game), to: Hangman.Game
 end
