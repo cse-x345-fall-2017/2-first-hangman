@@ -23,14 +23,16 @@ defmodule Hangman.Game do
   end
 
   def make_move(game = %Hangman.Game{}, guess) do
+    in_used = MapSet.member?(game.used, guess)
     used = MapSet.put( game.used, guess )
     in_word = Enum.member?( game.word, guess )
-    turns = turnDecrement( in_word, game.turns )
+    turns = turnDecrement( in_word || in_used, game.turns )
     state = guess_type( in_word )
     state = lost(state, turns)
     mask = word_mask(game.word,used)
     game_won = won(mask,game.word)
     state = won_atom(state,game_won)
+    state = used(in_used,state)
     next_game = %Hangman.Game{game | used: used, turns: turns,
     last_guess: guess,
     game_state: state}
@@ -47,6 +49,9 @@ defmodule Hangman.Game do
     word = Enum.map(word, fun)
     word
   end
+
+  def used(true,state) do :already_used end
+  def used(false,state) do state end
 
   def lost(:bad_guess, 0) do :lost end
   def lost(:good_guess, _turns) do :good_guess end
