@@ -5,14 +5,17 @@ defmodule Game do
     defstruct game_state: :initializing, turns_left: 7, letters: [], used: [], last_guess: "", random_word: ""
   end
 
+  @doc "Create new game with default state and random word"
   def newGame do
     %State{ random_word: Dictionary.WordList.random_word() }
   end
 
+  @doc "Create new game state for unit test"
   def newGame( word ) do
     %State{ random_word: word }
   end
 
+  @doc "Returns the tally for the given game"
   def game_tally( state ) do
     %{ game_state: state.game_state,
       turns_left: state.turns_left,
@@ -21,7 +24,7 @@ defmodule Game do
       last_guess: state.last_guess }
   end
 
-
+  @doc "returns a tuple containing the updated game state and a tally"
   def make_move( game, guess_char ) do
 
     guess_char = String.downcase(guess_char) |> String.trim
@@ -38,15 +41,17 @@ defmodule Game do
 
 
   # Private functions
-
+  @doc "returns a boolean guess_char containing in random_word"
   defp guess_char_contains_inWord( game, guess_char ) do
     String.contains?( game.random_word, to_string guess_char )
   end
 
+  @doc "returns a boolean guess_char containing in used list"
   defp guess_char_contains_inUsedList( game, guess_char ) do
     guess_char in game.used
   end
 
+  @doc "returns a boolean random_word equals user word"
   defp word_equals_userWord( game ) do
     String.equivalent?( game.random_word, to_string game.letters )
   end
@@ -73,28 +78,20 @@ defmodule Game do
   end
 
  # Utility methods
-
+  @doc "split the word and conver to list"
   defp word_split( split_the_word ) do
     String.split( split_the_word, "", trim: true )
     |> Enum.to_list
   end
 
+  @doc "mask the word using random_word and used list"
   defp word_masking_for_user( state ) do
     String.replace( state.random_word, ~r/[^#{[" " | state.used]}]/, "_" )
   end
 
+  @doc "number of turns left out for user to play"
   defp turns_left( game ) do
     game.turns_left - 1
-  end
-
-  def output_state( state ) do
-    IO.puts "The State info -
-                  Game Status  - #{state.game_state},
-                  Turns Left   - #{state.turns_left},
-                  Letters      - #{state.letters},
-                  Used         - #{state.used},
-                  Last Guess   - #{state.last_guess},
-                  Random word  - #{state.random_word}"
   end
 
 end
