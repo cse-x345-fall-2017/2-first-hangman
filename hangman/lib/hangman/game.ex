@@ -35,7 +35,7 @@ defmodule Hangman.Game do
     last_guess: guess,
     game_state: state}
     tally = tally(next_game)
-    {game, tally}
+    {next_game, tally}
   end
 
   def set_check(set,letter) do
