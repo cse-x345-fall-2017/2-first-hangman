@@ -56,19 +56,13 @@ defmodule Hangman.Game do
     |> Map.delete(:__struct__)
   end
 
-  # If lost then return then set the letters as list of word
-  defp replace_letters(%State{ game_state: :lost } = game, _) do
-    game.word
-    |> String.codepoints
-  end
-
   # Set all the letters in the word by an _. Used when game is initialized 
   # i.e., when used is empty.
   defp replace_letters(word, []),  do: List.duplicate("_", String.length(word))
 
   # Set the letters that have not yet been guessed by an _ in appropriate positions
-  defp replace_letters(word, used) do
-    String.replace(word, ~r/[^#{used}]/, "_") 
+  defp replace_letters(word, left) do
+    String.replace(word, ~r/[#{left}]/, "_") 
     |> String.codepoints
   end
 
@@ -96,10 +90,8 @@ defmodule Hangman.Game do
   # If guess is not in used, then check if guess is in the set of letters left
   # and handle accordingly
   defp update_state(game, true, false, guess)  do
-    used = concat_and_sort(game.used, guess)
     game = %State{ game | last_guess: guess,
-                          used:       used,
-                          letters:    replace_letters(game.word, used) }
+                          used:       concat_and_sort(game.used, guess) }
     handle_state(game, guess in game.left_letters_set, guess)
   end
 
@@ -128,11 +120,13 @@ defmodule Hangman.Game do
   defp lost?(game, turns) when turns > 0, do: %State{ game | game_state: :bad_guess }
 
   # Check if the set of letters left is none and set the game_state to :won
-  defp won?(game, 0), do: %State{ game | game_state: :won }
+  defp won?(game, 0), do: %State{ game | game_state: :won,
+                                         letters:    String.codepoints(game.word)}
 
   # Check if there are any more in the set of letters left and 
   # set the game_state to :good_guess
-  defp won?(game, _), do: %State{ game | game_state: :good_guess }
+  defp won?(game, _), do: %State{ game |  game_state: :good_guess,
+                                          letters:    replace_letters(game.word, MapSet.to_list(game.left_letters_set)) }
 
 end
 
