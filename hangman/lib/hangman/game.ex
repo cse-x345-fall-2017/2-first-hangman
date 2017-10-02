@@ -28,7 +28,7 @@ defmodule Hangman.Game do
     turns = turnDecrement( in_word, game.turns )
     state = guess_type( in_word )
     state = lost(state, turns)
-    mask = word_mask(game.word,game.used)
+    mask = word_mask(game.word,used)
     game_won = won(mask,game.word)
     state = won_atom(state,game_won)
     next_game = %Hangman.Game{game | used: used, turns: turns,
