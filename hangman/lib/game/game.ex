@@ -34,7 +34,7 @@ defmodule Hangman.Game do
     end
 
     defp retrieve_word() do
-        Dictionary.WordList.random_word() |> String.split("", trim: true) 
+        Dictionary.WordList.random_word() |> String.split( "", trim: true ) 
     end
 
     defp process_guess( game, guess ) do
