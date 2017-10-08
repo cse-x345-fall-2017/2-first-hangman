@@ -36,7 +36,7 @@ defmodule GameTest do
     game = Hangman.new_game()
     game = %State{ game | word: word, letters: letters}
 
-    { state, new, old } = Hangman.Game.fill_occurences(guess,game)
+    { state, new, old } = Hangman.Game.fill_occurences(game, guess)
     
     assert %State{} = state
     assert new == ["_", "e", "e", "_", "e"]
@@ -80,22 +80,23 @@ defmodule GameTest do
     game = %State{ game | word: word, letters: letters_new }
 
     # Identifies good guess
-    result_1 = Hangman.Game.give_feedback(letters_new, letters, game)
+    result_1 = Hangman.Game.give_feedback({ game, letters_new, letters })
     assert %State{ game_state: :good_guess} = result_1
 
     # Identifies win state
     game_2 = %State{ game | letters: word }
-    result_2 = Hangman.Game.give_feedback(word, letters, game_2)
+    result_2 = Hangman.Game.give_feedback({ game_2, word, letters })
     assert %State{ game_state: :won} = result_2
 
     # Identifies wrong guess
     game_3 = %State{ game | letters: letters }
-    result_3 = Hangman.Game.give_feedback(letters, letters, game_3)
+    result_3 = Hangman.Game.give_feedback({ game_3, letters, letters })
     assert %State{ game_state: :bad_guess} = result_3
 
     # Identifies lose state
     game_4 = %State{ game | turns_left: 1 , letters: letters}
-    result_4 = Hangman.Game.give_feedback(letters, letters, game_4)
+    result_4 = Hangman.Game.give_feedback({ game_4, letters, letters })
     assert %State{ game_state: :lost} = result_4
   end
+
 end

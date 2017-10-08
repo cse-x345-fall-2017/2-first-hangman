@@ -94,7 +94,7 @@ defmodule HangmanTest do
     assert tally.used == ["e"]
     # Bad guess
     { _, tally } = Hangman.make_move(game, "c")
-    assert tally.used == ["e", "c"]
+    assert tally.used == ["c", "e"]
   end
 
   test "letters guessed recorded correctly on making move" do

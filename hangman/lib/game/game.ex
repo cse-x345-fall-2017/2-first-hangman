@@ -18,65 +18,103 @@ defmodule Hangman.Game do
     }
   end
 
-  def tally(%State{ game_state: state,
-                    turns_left: turns,
-                    letters: letters,
-                    used: used})
+  def tally(game)
   do
     %{
-      game_state: state,
-      turns_left: turns,
-      letters: letters,
-      used: used
+      game_state: game.game_state,
+      turns_left: game.turns_left,
+      letters: game.letters,
+      used: game.used,
+      last_guess: game.last_guess
     }
   end
 
-  def fill_occurences(guess, game) do 
+  def make_move(game, guess) do
+    make_move(game, guess, Enum.member?(game.used, guess))
+  end
+
+  # Character has already been guessed
+  def make_move(game, _guess, true) do
+    %State{ game | game_state: :already_guessed} |> send_updated_state()
+  end
+
+  # Guess is new
+  def make_move(game, guess, false) do
+    game 
+      |> update_guessed(guess)
+      |> fill_occurences(guess)
+      |> give_feedback()
+      |> send_updated_state()
+  end
+
+  # Send new state with tally
+  def send_updated_state(game), do: { game, tally(game) }
+
+  # Returns a new state with an updated list of used guesses
+  def update_guessed(game, guess) do
+    include_guess = game.used |> Enum.concat([guess]) |> Enum.sort()
+    %State{ game | used: include_guess, last_guess: guess }
+  end
+
+  # Fills occurences(if any) of guess in the word
+  def fill_occurences(game, guess) do 
     result = fill_occurences(guess, game.word, game.letters, [])
     { %State{ game | letters: result}, result, game.letters }
   end
-
-  # First alphabet matches guess
-  def fill_occurences(guess, [ guess | word_tail ], [ _alphabet | letters_tail ], result) do
-    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat([guess]))
-  end
   # When the alphabet at the position in word has already been guessed right
-  def fill_occurences(guess, [ alphabet | word_tail ], [ alphabet | letters_tail ], result)
+  def fill_occurences(guess,
+                      [ alphabet | word_tail ], 
+                      [ alphabet | letters_tail ], 
+                      result)
   do
-    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat([alphabet]))
+    result = result |> Enum.concat([alphabet])
+    fill_occurences(guess, word_tail, letters_tail, result)
   end
-
-  # When guess matches the current alphabet
-  def fill_occurences(guess, [ guess | word_tail ], [ "_" | letters_tail ], result)
+  # When guess matches the current alphabet in the word
+  def fill_occurences(guess,
+                      [ guess | word_tail ],
+                      [ _char | letters_tail ],
+                      result)
   do
-    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat([guess]))
+    result = result |> Enum.concat([guess])
+    fill_occurences(guess, word_tail, letters_tail, result)
   end
-
   # When guess does not match the current alphabet
-  def fill_occurences(guess, [ _alphabet | word_tail ], [ "_" | letters_tail ], result)
+  def fill_occurences(guess,
+                      [ _alphabet | word_tail ],
+                      [ _char | letters_tail ],
+                      result)
   do
-    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat(["_"]))
+    result = result |> Enum.concat(["_"])
+    fill_occurences(guess, word_tail, letters_tail, result)
   end
-
-  # No alphabets left
+  # No alphabets left to compare in the word
   def fill_occurences(_guess, [], _letters, result), do: result
   
-  def give_feedback(_letters, _letters, game) do
+  # Checks if guess results in changes and updates state accordingly
+  def give_feedback({ game, letters, letters }) do
     on_bad_guess(game.turns_left, game)
   end
-  def give_feedback(_letters_new, _letters, game) do
+  def give_feedback({ game, _letters_new, _letters }) do
     on_good_guess(game.letters, game.word, game)
   end
 
-  def on_good_guess(word, word, game), do: %State{ game | game_state: :won}
+  # Feedback helper when guess is right
+  def on_good_guess(word, word, game) do
+    %State{ game | game_state: :won, letters: wordify(game.word)}
+  end
   def on_good_guess(_letters, _word, game) do
     %State{ game | game_state: :good_guess}
   end
 
-  def on_bad_guess(1, game), do: %State{ game | game_state: :lost}
+  # Feedback helper when guess is wrong
+  def on_bad_guess(1, game) do
+    %State{ game | game_state: :lost, letters: wordify(game.word)}
+  end
   def on_bad_guess(turns_left, game) do
     %State{ game | turns_left: turns_left-1, game_state: :bad_guess}
   end
 
-  # def wordify(letters), do: [Enum.join(letters, "")]
+  # Helper to reduce list of alphabets into a single-word list
+  def wordify(letters), do: [Enum.join(letters, "")]
 end
