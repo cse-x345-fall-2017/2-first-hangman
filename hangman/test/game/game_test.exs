@@ -38,8 +38,24 @@ defmodule GameTest do
 
     { state, new, old } = Hangman.Game.fill_occurences(guess,game)
     
-    assert state = %State{}
+    assert %State{} = state
     assert new == ["_", "e", "e", "_", "e"]
     assert old == letters
+  end
+
+  test "helper on_good_guess updates state correctly on good guess" do
+    word = ["p","e", "e", "v", "e"]
+    letters = ["_", "e", "e", "_", "e"]
+    
+    game = Hangman.new_game()
+    game = %State{ game | word: word, letters: letters}
+
+    result = Hangman.Game.on_good_guess(letters, word, game)
+    assert %State{ game_state: :good_guess } = result
+
+    letters = ["p", "e", "e", "v", "e"]
+
+    result_2 = Hangman.Game.on_good_guess(letters, word, game)
+    assert %State{ game_state: :won } = result_2
   end
 end

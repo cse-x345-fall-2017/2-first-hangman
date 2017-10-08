@@ -61,4 +61,8 @@ defmodule Hangman.Game do
   # No alphabets left
   def fill_occurences(_guess, [], _letters, result), do: result
   
+  def on_good_guess(word, word, game), do: %State{ game | game_state: :won}
+  def on_good_guess(_letters, _word, game) do
+    %State{ game | game_state: :good_guess}
+  end
 end
