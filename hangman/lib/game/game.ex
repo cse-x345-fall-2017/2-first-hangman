@@ -31,32 +31,34 @@ defmodule Hangman.Game do
     }
   end
 
-  def evaluate(guess, word, letters), do: evaluate(guess,
-                                                   word,
-                                                   letters,
-                                                   [])
+  def fill_occurences(guess, game) do 
+    result = fill_occurences(guess, game.word, game.letters, [])
+    { %State{ game | letters: result}, result, game.letters }
+  end
+
   # First alphabet matches guess
-  def evaluate(guess, [ guess | word_tail ], [ _alphabet | letters_tail ], letters_new) do
-    evaluate(guess, word_tail, letters_tail, letters_new |> Enum.concat([guess]))
+  def fill_occurences(guess, [ guess | word_tail ], [ _alphabet | letters_tail ], result) do
+    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat([guess]))
   end
   # When the alphabet at the position in word has already been guessed right
-  def evaluate(guess, [ alphabet | word_tail ], [ alphabet | letters_tail ], letters_new)
+  def fill_occurences(guess, [ alphabet | word_tail ], [ alphabet | letters_tail ], result)
   do
-    evaluate(guess, word_tail, letters_tail, letters_new |> Enum.concat([alphabet]))
+    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat([alphabet]))
   end
 
   # When guess matches the current alphabet
-  def evaluate(guess, [ guess | word_tail ], [ "_" | letters_tail ], letters_new)
+  def fill_occurences(guess, [ guess | word_tail ], [ "_" | letters_tail ], result)
   do
-    evaluate(guess, word_tail, letters_tail, letters_new |> Enum.concat([guess]))
+    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat([guess]))
   end
 
   # When guess does not match the current alphabet
-  def evaluate(guess, [ _alphabet | word_tail ], [ "_" | letters_tail ], letters_new)
+  def fill_occurences(guess, [ _alphabet | word_tail ], [ "_" | letters_tail ], result)
   do
-    evaluate(guess, word_tail, letters_tail, letters_new |> Enum.concat(["_"]))
+    fill_occurences(guess, word_tail, letters_tail, result |> Enum.concat(["_"]))
   end
 
   # No alphabets left
-  def evaluate(_guess, [], _letters, letters_new), do: letters_new
+  def fill_occurences(_guess, [], _letters, result), do: result
+  
 end

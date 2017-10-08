@@ -14,17 +14,32 @@ defmodule GameTest do
   #                                                    game.letters)       
   # end
 
-  test " guess is evaluated correctly" do
+  test "fill_occurences (helper; arity = 4) returns occurences filled" do
     # word is peeve, guess is 'e'
     word = ["p","e", "e", "v", "e"]
     guess = "e"
     letters = ["_","_", "_", "_", "_"]
-    result_1 =  Hangman.Game.evaluate(guess, word, letters)
+    result_1 =  Hangman.Game.fill_occurences(guess, word, letters, [])
 
     assert result_1 == ["_", "e", "e", "_", "e"]
 
-    result_2 = Hangman.Game.evaluate("p", word, result_1)
+    result_2 = Hangman.Game.fill_occurences("p", word, result_1, [])
 
     assert result_2 == ["p", "e", "e", "_", "e"]
+  end
+
+  test "fill_occurences (arity = 2) returns new state, occurence of current guess and occurence of last guess" do
+    word = ["p","e", "e", "v", "e"]
+    guess = "e"
+    letters = ["_","_", "_", "_", "_"]
+
+    game = Hangman.new_game()
+    game = %State{ game | word: word, letters: letters}
+
+    { state, new, old } = Hangman.Game.fill_occurences(guess,game)
+    
+    assert state = %State{}
+    assert new == ["_", "e", "e", "_", "e"]
+    assert old == letters
   end
 end
