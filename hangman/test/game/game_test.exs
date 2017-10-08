@@ -70,4 +70,32 @@ defmodule GameTest do
     result_2 = Hangman.Game.on_bad_guess(game.turns_left, game)
     assert %State{ game_state: :lost } = result_2
   end
+
+  test "give_feedback gives correct feedback on move" do
+    word = ["p","e", "e", "v", "e"]
+    letters_new = ["_", "e", "e", "_", "e"]
+    letters = ["_","_", "_", "_", "_"]
+    
+    game = Hangman.new_game()
+    game = %State{ game | word: word, letters: letters_new }
+
+    # Identifies good guess
+    result_1 = Hangman.Game.give_feedback(letters_new, letters, game)
+    assert %State{ game_state: :good_guess} = result_1
+
+    # Identifies win state
+    game_2 = %State{ game | letters: word }
+    result_2 = Hangman.Game.give_feedback(word, letters, game_2)
+    assert %State{ game_state: :won} = result_2
+
+    # Identifies wrong guess
+    game_3 = %State{ game | letters: letters }
+    result_3 = Hangman.Game.give_feedback(letters, letters, game_3)
+    assert %State{ game_state: :bad_guess} = result_3
+
+    # Identifies lose state
+    game_4 = %State{ game | turns_left: 1 , letters: letters}
+    result_4 = Hangman.Game.give_feedback(letters, letters, game_4)
+    assert %State{ game_state: :lost} = result_4
+  end
 end

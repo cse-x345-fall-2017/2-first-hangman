@@ -61,6 +61,13 @@ defmodule Hangman.Game do
   # No alphabets left
   def fill_occurences(_guess, [], _letters, result), do: result
   
+  def give_feedback(_letters, _letters, game) do
+    on_bad_guess(game.turns_left, game)
+  end
+  def give_feedback(_letters_new, _letters, game) do
+    on_good_guess(game.letters, game.word, game)
+  end
+
   def on_good_guess(word, word, game), do: %State{ game | game_state: :won}
   def on_good_guess(_letters, _word, game) do
     %State{ game | game_state: :good_guess}
@@ -70,4 +77,6 @@ defmodule Hangman.Game do
   def on_bad_guess(turns_left, game) do
     %State{ game | turns_left: turns_left-1, game_state: :bad_guess}
   end
+
+  # def wordify(letters), do: [Enum.join(letters, "")]
 end
