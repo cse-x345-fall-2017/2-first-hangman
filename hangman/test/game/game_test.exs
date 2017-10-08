@@ -58,4 +58,16 @@ defmodule GameTest do
     result_2 = Hangman.Game.on_good_guess(letters, word, game)
     assert %State{ game_state: :won } = result_2
   end
+
+  test "helper on_bad_guess updates state correctly on bad guess" do
+    game = Hangman.new_game()
+
+    result = Hangman.Game.on_bad_guess(game.turns_left, game)
+    assert %State{ game_state: :bad_guess } = result
+
+    game = %State{ game | turns_left: 1 }
+
+    result_2 = Hangman.Game.on_bad_guess(game.turns_left, game)
+    assert %State{ game_state: :lost } = result_2
+  end
 end

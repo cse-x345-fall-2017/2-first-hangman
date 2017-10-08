@@ -65,4 +65,9 @@ defmodule Hangman.Game do
   def on_good_guess(_letters, _word, game) do
     %State{ game | game_state: :good_guess}
   end
+
+  def on_bad_guess(1, game), do: %State{ game | game_state: :lost}
+  def on_bad_guess(turns_left, game) do
+    %State{ game | turns_left: turns_left-1, game_state: :bad_guess}
+  end
 end
