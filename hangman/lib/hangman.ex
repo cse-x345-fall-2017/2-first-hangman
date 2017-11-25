@@ -86,7 +86,7 @@ defmodule Hangman do
 
     def tally(game) do
       game = make_move({}, "")
-    
+      game
       end
 
  end
