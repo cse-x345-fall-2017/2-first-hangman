@@ -89,8 +89,11 @@ defmodule Hangman do
    end
 
    if are_equal and !is_won and turn_left == 0 do
-   new_game = %{game |game_state: "Lost", last_guess: guess, turn_left: turn_left - 1}
+   new_game = %{game |game_state: "Lost", last_guess: guess}
    new_game
+   end
+   if are_equal and !is_won do
+     new_game = %{game |turns_left: game.turns_left - 1}
    end
 
     end
